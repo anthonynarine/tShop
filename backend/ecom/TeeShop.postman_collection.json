@@ -13,6 +13,14 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "get_all_products",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
