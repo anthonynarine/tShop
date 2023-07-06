@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",  #used for custom signup
     "api", 
     "api.category", 
+    "api.product", 
 ]
 
 MIDDLEWARE = [
