@@ -154,4 +154,9 @@ SPECTACULAR_SETTINGS = {
 }
 
 #NEW 
-AUTH_USER_MODEL = "user.CustomUser" 
+# AUTH_USER_MODEL = "user.CustomUser" 
+
+
+
+
+
