@@ -1,0 +1,37 @@
+this folder must be created at the manage.py level 
+
+to set up images 
+
+pip install pillow
+
+# settings.py
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+#urls.py
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# model example
+from django.db import models
+
+class YourModel(models.Model):
+    image = models.ImageField(upload_to='images/')
+    # Other fields and properties of your model
+
+
+#serialization 
+from rest_framework import serializers
+from .models import YourModel
+
+class YourModelSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)  # Custom field for the image
+
+    class Meta:
+        model = YourModel
+        fields = '__all__'
+
+
+

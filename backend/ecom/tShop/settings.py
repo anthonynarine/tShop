@@ -25,11 +25,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # external
     "corsheaders",
     "rest_framework", 
     "rest_framework.authtoken",  #used for custom signup
+    "drf_spectacular",
+    #internal
     "api", 
     "api.category", 
+    "api.product", 
 ]
 
 MIDDLEWARE = [
@@ -133,10 +137,17 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
 # HANDLING IMAGES
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# NEW
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Django DRF TeeShop",
+}
