@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "api", 
     "api.category", 
     "api.product", 
+    "api.user"
 ]
 
 MIDDLEWARE = [
@@ -151,3 +152,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 SPECTACULAR_SETTINGS = {
     "TITLE": "Django DRF TeeShop",
 }
+
+#NEW 
+AUTH_USER_MODEL = "user.CustomUser" 
