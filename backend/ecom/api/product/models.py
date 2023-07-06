@@ -18,7 +18,7 @@ class Product(models.Model):
     stock = models.IntegerField(validators=[validate_positive])
     is_active = models.BooleanField(default=True, blank=True)
     image = models.ImageField(upload_to="images/", blank=True)
-    create_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     
