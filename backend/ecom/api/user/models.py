@@ -2,8 +2,11 @@ from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .managers import CustomUserMaager
+
 
 class CustomUser(AbstractUser):
+    username = None
     name = models.CharField(max_length=50, default="Anonymous")
     email = models.EmailField(max_length=100, unique=True)
     
@@ -21,3 +24,8 @@ class CustomUser(AbstractUser):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = CustomUserMaager()
+    
+    def __str__(self) -> str:
+        return self.email
