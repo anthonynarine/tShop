@@ -87,32 +87,24 @@ def logout(request, id):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classs_by_action = {"create": [AllowAny]}
+    permission_classes_by_action = {"create": [AllowAny]}
 
     queryset = CustomUser.objects.all().order_by("id")
     serializer_class = UserSerializer
 
-    # def get_permissions(self):
-    #     try:
-    #         return [
-    #             permission()
-    #             for permission in self.permission_classes_by_action.get(
-    #                 self.action, self.permission_classes
-    #             )
-    #         ]
-    #     except TypeError:
-    #         return [permission() for permission in self.permission_classes]
         
-def get_permissions(self):
-    try:
-        # Get the permission classes based on the current action, or use the default permission classes
-        action_permission_classes = self.permission_classes_by_action.get(self.action, self.permission_classes)
+    def get_permissions(self):
+        try:
+            # Get the permission classes based on the current action, or use the default permission classes
+            action_permission_classes = self.permission_classes_by_action.get(self.action, self.permission_classes)
+            
+            # Instantiate the permission classes
+            permissions = [permission() for permission in action_permission_classes]
+        except TypeError:
+            # If an error occurs, fallback to the default permission classes
+            permissions = [permission() for permission in self.permission_classes]
         
-        # Instantiate the permission classes
-        permissions = [permission() for permission in action_permission_classes]
-    except TypeError:
-        # If an error occurs, fallback to the default permission classes
-        permissions = [permission() for permission in self.permission_classes]
-    
-    # Return the list of instantiated permission classes
-    return permissions
+        # Return the list of instantiated permission classes
+        return permissions
+
+

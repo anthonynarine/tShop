@@ -21,6 +21,14 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "Signup",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
