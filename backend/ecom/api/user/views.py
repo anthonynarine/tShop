@@ -1,34 +1,99 @@
-from django.shortcuts import render
-import random
+import secrets
+import string
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from .serializers import UserSerializer
+from .models import CustomUser
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login, logout as django_logout
+import re
 
 
-"""creates a session token of a specified length by randomly 
-selecting characters from a combination of lowercase letters and numbers."""
-
-def generate_session_token(length=10):
-    return "".join(
-        random.SystemRandom().choice(
-            [chr(i) for i in range(97, 123)] + [str(i) for i in range(10)]
-        )
-        for _ in range(10)
-    )
-    
-    
-    
-    
+def generate_session_token(length=16):
     """
-    " ".join(...) joins the characters generated in the loop into a string. 
-    The string is initialized as empty since there is a pair of empty double quotes "".
-random.SystemRandom().choice(...) randomly selects an element from the given list of characters.
-The list comprehension [chr(i) for i in range(6, 23)] + [str(i) for i in range(10)] creates 
-a list of characters. It combines lowercase letters 'a' to 'p' (chr(i) converts ASCII values
-from 6 to 22) with digits 0 to 9 (str(i) converts integers from 0 to 9).
-The outer for _ in range(length) loop generates the desired number of characters
-based on the specified length. The loop runs length times, where each iteration 
-calls random.SystemRandom().choice(...) to randomly choose a character from the list
-of characters.The selected characters are concatenated into a string using the "".join(...) method.
-In summary, the generate_session_token function generates a random session token
-consisting of alphanumeric characters (lowercase letters 'a' to 'p' and digits 0 to 9). 
-The length of the token can be specified as an argument when calling the function, 
-defaulting to a length of 10 if not provided.
-"""
+    Generate a secure session token of a specified length by using a
+    cryptographically secure random number generator.
+
+    Parameters:
+        length (int): The desired length of the session token. Default is 16.
+
+    Returns:
+        str: The generated session token.
+    """
+    choices = string.ascii_letters + string.digits
+    token = "".join(secrets.choice(choices) for _ in range(length))
+    return token
+
+
+@csrf_exempt  # allows sign in from other origins
+def login(request):
+    """sign in functionality"""
+    # if the request is not a POST
+    if request.method != "POST":
+        return JsonResponse({"error": "Send a post request with valid parameters only"})
+
+    username = request.POST.get("email")
+    password = request.POST.get("password")
+
+    # validating email with a rgex email validator pattern
+    if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", username):
+        return JsonResponse({"error": "Enter a valid e-mail"})
+
+    if len(password) < 5:
+        return JsonResponse({"error": "Password needs to be at least 5 characters"})
+
+    UserModel = get_user_model()
+
+    try:
+        user = UserModel.objects.get(email=username)
+
+        if user.check_password(password):
+            user_dict = UserModel.objects.filter(email=username).values().first
+            user_dict.pop("password")
+
+            if user.session_token != "0":
+                user.session_token = "0"
+                user.save()
+                return JsonResponse({"error": "A previous session exist!"})
+
+            token = generate_session_token()
+            user.session_token = token
+            user.save()
+            login(request, user)
+            return JsonResponse({"token": token, "user": user_dict})
+        else:
+            return JsonResponse({"error": "Invalid password"})
+
+    except UserModel.DoesNotExist:
+        return JsonResponse({"error": "Invalid Email"})
+
+
+def logout(request, id):
+     # Log out the user using Django's built-in logout function
+    django_logout(request)
+
+    UserModel = get_user_model()
+
+    try:
+        user = UserModel.objects.get(pk=id)
+        user.session_token = "0"
+        user.save()
+    except UserModel.DoesNotExist:
+        return JsonResponse({"error": "Invalid user ID"})
+
+    return JsonResponse({"success": "Logged out"})
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_class_by_action = {"create": [AllowAny]}
+
+    queryset = CustomUser.objects.all().order_by("id")
+    serializer_class = UserSerializer
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
