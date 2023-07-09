@@ -1,5 +1,7 @@
 import secrets
 import string
+from rest_framework.decorators import authentication_classes, permission_classes
+
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
@@ -9,6 +11,8 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login, logout as django_logout
 import re
+from rest_framework.authentication import TokenAuthentication
+
 
 
 def generate_session_token(length=16):
@@ -28,42 +32,45 @@ def generate_session_token(length=16):
 
 
 @csrf_exempt  # allows sign in from other origins
-def login(request):
+@authentication_classes([[TokenAuthentication]])
+@permission_classes([])
+def login_user(request):
     """sign in functionality"""
     # if the request is not a POST
     if request.method != "POST":
         return JsonResponse({"error": "Send a post request with valid parameters only"})
 
-    username = request.POST.get("email")
-    password = request.POST.get("password")
-
+    username = request.POST["email"]
+    password = request.POST["password"]
     # validating email with a rgex email validator pattern
     if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", username):
         return JsonResponse({"error": "Enter a valid e-mail"})
 
-    if len(password) < 5:
+    if len(password) < 6:
         return JsonResponse({"error": "Password needs to be at least 5 characters"})
 
+# once a valid email and password are entered create a UserModel instance with entered credentials 
     UserModel = get_user_model()
 
     try:
         user = UserModel.objects.get(email=username)
 
         if user.check_password(password):
-            user_dict = UserModel.objects.filter(email=username).values().first
+            user_dict = UserModel.objects.filter(email=username).values().first()
             user_dict.pop("password")
 
             if user.session_token != "0":
                 user.session_token = "0"
                 user.save()
                 return JsonResponse({"error": "A previous session exist!"})
-
-            token = generate_session_token()
+# if the user has no token create one for him/her
+            token = generate_session_token() #custom func above
             user.session_token = token
             user.save()
             login(request, user)
             return JsonResponse({"token": token, "user": user_dict})
         else:
+           # if pw does not match any 
             return JsonResponse({"error": "Invalid password"})
 
     except UserModel.DoesNotExist:
