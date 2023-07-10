@@ -14,7 +14,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
 from .models import CustomUser
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
@@ -92,8 +92,6 @@ def login_user(request):
 
     except UserModel.DoesNotExist:
         return JsonResponse({"error": "Invalid email"})
-
-
 
 
 def logout_user(request, id):
