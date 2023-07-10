@@ -14,7 +14,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
 from .models import CustomUser
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import login, logout 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
@@ -39,7 +39,7 @@ def generate_session_token(length=10):
         random.SystemRandom().choice(
             [chr(i) for i in range(97, 123)] + [str(i) for i in range(10)]
         )
-        for _ in range(10)
+        for _ in range(length)
     )
 
     # version 2.
@@ -48,52 +48,54 @@ def generate_session_token(length=10):
     # return token
 
 
-@csrf_exempt
-@authentication_classes([TokenAuthentication])  # Add the desired authentication class
-@permission_classes([AllowAny])
+# @authentication_classes([[TokenAuthentication]])
+# @permission_classes([])
+@csrf_exempt  # allows sign in from other origins
 def login_user(request):
-    """Sign in functionality"""
+    """sign in functionality"""
+    # if the request is not a POST
     if request.method != "POST":
-        return JsonResponse({"error": "Send a POST request with valid parameters only"})
+        return JsonResponse({"error": "Send a post request with valid parameters only"})
+    # extract the username and password data from the login request
+    username = request.POST["email"]
+    password = request.POST["password"]
+     # Validate email format using regular expression
+    if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", username):
+        return JsonResponse({"error": "Enter a valid e-mail"})
+    # check if pw lenght is not less than 6 chars
+    if len(password) < 6:
+        return JsonResponse({"error": "Password needs to be at least 6 characters"})
 
-    email = request.POST.get("email")
-    password = request.POST.get("password")
-
-    if not email or not password:
-        return JsonResponse({"error": "Email and password are required"})
-
-    # Validate email format using regular expression
-    if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
-        return JsonResponse({"error": "Enter a valid email"})
-
+    # once a valid email and password are entered create a UserModel instance with entered credentials
     UserModel = get_user_model()
 
+    """
+   retrieves the user model using the get_user_model() 
+     function, which returns the currently active user model."""
     try:
-        user = UserModel.objects.get(email=email)
+        user = UserModel.objects.get(email=username)
 
         if user.check_password(password):
+            user_dict = UserModel.objects.filter(
+                email=username).values().first()
+            user_dict.pop("password")
+
             if user.session_token != "0":
                 user.session_token = "0"
                 user.save()
                 return JsonResponse({"error": "A previous session exists!"})
-
-            token = generate_session_token()  # Generate session token
+            # if the user has no token create one for him/her
+            token = generate_session_token()  # custom func above
             user.session_token = token
             user.save()
-
-            # Use Django's built-in authentication methods to login the user
-            authenticated_user = authenticate(email=email, password=password)
-            login(request, authenticated_user)
-
-            serializer = UserSerializer(user)
-            return JsonResponse({"token": token, "user": serializer.data})
+            login(request, user) #django resource
+            return JsonResponse({"token": token, "user": user_dict})
         else:
+            # if pw does not match any
             return JsonResponse({"error": "Invalid password"})
 
     except UserModel.DoesNotExist:
-        return JsonResponse({"error": "Invalid email"})
-
-
+        return JsonResponse({"error": "Invalid Email"})
 
 
 def logout_user(request, id):
