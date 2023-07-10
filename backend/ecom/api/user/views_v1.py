@@ -14,7 +14,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
 from .models import CustomUser
-from django.contrib.auth import login, logout as django_logout
+from django.contrib.auth import login, logout 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
@@ -39,7 +39,7 @@ def generate_session_token(length=10):
         random.SystemRandom().choice(
             [chr(i) for i in range(97, 123)] + [str(i) for i in range(10)]
         )
-        for _ in range(10)
+        for _ in range(length)
     )
 
     # version 2.
@@ -48,9 +48,9 @@ def generate_session_token(length=10):
     # return token
 
 
-@csrf_exempt  # allows sign in from other origins
 # @authentication_classes([[TokenAuthentication]])
 # @permission_classes([])
+@csrf_exempt  # allows sign in from other origins
 def login_user(request):
     """sign in functionality"""
     # if the request is not a POST
@@ -98,9 +98,9 @@ def login_user(request):
         return JsonResponse({"error": "Invalid Email"})
 
 
-def logout(request, id):
+def logout_user(request, id):
     # Log out the user using Django's built-in logout function
-    django_logout(request)
+    logout(request)
 
     UserModel = get_user_model()
 

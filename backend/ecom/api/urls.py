@@ -7,6 +7,6 @@ urlpatterns = [
     path("", home, name="api.home"),
     path("category/", include("api.category.urls")),
     path("products/", include("api.product.urls")),
-    path("user/", include("api.user.urls")),
+    path("user/", include("api.user.urls")), #sign up user
     
 ]

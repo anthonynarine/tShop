@@ -94,16 +94,11 @@ def login_user(request):
         return JsonResponse({"error": "Invalid email"})
 
 
-def logout_user(request):
-    # Use Django's built-in logout function to log out the user
-    logout(request)
-
-    return JsonResponse({"success": "Logged out"})
 
 
-def logout(request, id):
+def logout_user(request, id):
     # Log out the user using Django's built-in logout function
-    django_logout(request)
+    logout(request)
 
     UserModel = get_user_model()
 
