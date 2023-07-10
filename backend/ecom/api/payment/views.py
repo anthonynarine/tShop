@@ -30,7 +30,7 @@ def validate_user_session(id, token):
 
 # send a token
 @csrf_exempt
-def generate_token(request, id, token):
+def generate_gateway_token(request, id, token):
     if not validate_user_session(id, token):
         return JsonResponse({"error": "invalid session, Please login again!"})
 
