@@ -1,10 +1,10 @@
-import './App.css';
+import './styles.css';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <header className="App-header">
-    Project start
+    App component
       </header>
     </div>
   );
