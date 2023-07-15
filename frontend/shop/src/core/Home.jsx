@@ -1,6 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { baseUrl } from "./shared";
+import Base from "./Base";
+import Card from "./Card";
+
+import "../styles.css";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -12,32 +16,38 @@ export default function Home() {
     async function fetchProducts() {
       try {
         const url = `${baseUrl}api/products/`;
-        const response = await fetch(url,);
+        const response = await fetch(url);
         const data = await response.json();
         console.log(data);
         setProducts(data);
       } catch (error) {
-        setError(error)
-        console.log("Error:", error)
+        setError(error);
+        console.log("Error:", error);
       }
     }
-    
+
     fetchProducts();
   }, []);
 
-  if (error){
-    return <div>Error: {error.message}</div>
+  if (error) {
+    return <div>Error: {error.message}</div>;
   }
 
   return (
-    <>
-      {products ? (
-        products.map((product) => {
-          return <div>{product.name}</div>;
-        })
-      ) : (
-        <p>No data available</p>
-      )}
-    </>
+    <Base title="Home page" description="Welcome to The shop">
+      <div className="row py-4">
+        {products ? (
+          products.map((product) => {
+            return (
+              <div key={product.id} className="col-4 mb-4">
+                < Card product={product} />
+              </div>
+            );
+          })
+        ) : (
+          <p>No data available</p>
+        )}
+      </div>
+    </Base>
   );
 }
