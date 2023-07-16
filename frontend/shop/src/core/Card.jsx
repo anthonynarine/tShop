@@ -1,3 +1,4 @@
+/* eslint-disable no-lone-blocks */
 import React, { useContext } from "react";
 import { addItemToCart } from "./helper/cartHelper";
 import ImageHelper from "./helper/imageHelper";
@@ -6,10 +7,10 @@ import { CartContext } from "./helper/CartContext";
 
 const isAuthenticated = true;
 
-const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
+const Card = ({ product }) => {
   const navigate = useNavigate();
 
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, removeFromCart, cart } = useContext(CartContext);
 
   // check if data is available
   if (!product) {
@@ -27,6 +28,11 @@ const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
     }
   };
 
+  const handleRemoveFromCart = () => {
+    removeFromCart(product);
+    console.log("removed from cart");
+  };
+
   const showAddToCartBtn = () => {
     return (
       // handleAddToCart && (
@@ -41,12 +47,13 @@ const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
   };
 
   const showRemoveFromCart = () => {
+  // conditionally renders btn based on the presence of an iteam in the cart context state
+    if(cart.some((item)=> item.id === product.id))
+    // Note on some function below
     return (
       removeFromCart && (
         <button
-          onClick={() => {
-            console.log("Item removed");
-          }}
+          onClick={handleRemoveFromCart}
           className="btn btn-block btn-outline-danger mt-2 mb-2"
         >
           Remove from cart
@@ -76,3 +83,20 @@ const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
 };
 
 export default Card;
+
+
+                // The sum()
+
+{/* The some() function is an array method in JavaScript that 
+tests whether at least one element in the array passes a 
+provided condition. Here's an explanation of how it works:
+
+The some() function takes a callback function as its argument.
+This callback function is executed for each element in the array.
+Inside the callback function, you define a condition that needs to 
+be satisfied by at least one element in the array.
+The some() function iterates over each element in the array 
+and invokes the callback function on each iteration.
+If the callback function returns true for any element, 
+the some() function immediately returns true without furthe
+iteration and stops checking the remaining elements. */}
