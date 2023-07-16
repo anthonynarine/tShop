@@ -7,81 +7,82 @@
 
 
 
-// Importing necessary dependencies and helper functions
 import { addItemToCart, removeItemFromCart } from "../helper/cartHelper";
 import ImageHelper from "../helper/imageHelper";
 import { useNavigate } from "react-router-dom";
 
-// A boolean variable to represent the authentication status
 const isAuthenticated = true;
 
 /**
  * Card component represents a card displaying product information.
  *
- * @param {Object} product - The product object to display in the card.
- * @param {boolean} addToCart - Determines if the Add to Cart button should be shown (default: true).
- * @param {boolean} removeFromCart - Determines if the Remove from Cart button should be shown (default: true).
+ * @param {Object} props - The component props.
+ * @param {Object} props.product - The product object to display in the card.
+ * @param {boolean} [props.addToCart=true] - Determines if the Add to Cart button should be shown.
+ * @param {boolean} [props.removeFromCart=true] - Determines if the Remove from Cart button should be shown.
+ * @returns {JSX.Element} The Card component.
  */
-const Card = ({ product, addtoCart = true, removeFromCart = true }) => {
+const Card = ({ product, addToCart = true, removeFromCart = true }) => {
   const navigate = useNavigate();
 
-  // Check if the product data is available
-  if (!product) {
-    return <div>Loading...</div>;
-  }
-
   /**
-   * Function to add the product to the cart.
-   * It checks if the user is authenticated and adds the product to the cart using the `addItemToCart` helper function.
-   * If the user is not authenticated, it logs a message to the console.
+   * Handles the Add to Cart button click event.
    */
-  const addToCart = () => {
+  const handleAddToCart = () => {
     if (isAuthenticated) {
-      addItemToCart(product, () => {}); // Use the `addItemToCart` helper function to add the product to the cart
+      addItemToCart(product, () => {
+        // localStorage
+      });
       console.log("Added to cart");
     } else {
-      console.log("Login please");
+      console.log("Please log in");
       // navigate("/login"); // Redirect to the login page if the user is not authenticated
     }
   };
 
   /**
-   * Function to show the Add to Cart button.
-   * It checks the value of `addToCart` prop and conditionally renders the button.
+   * Renders the Add to Cart button.
+   * @returns {JSX.Element|null} The Add to Cart button JSX element, or null if addToCart prop is false.
    */
   const showAddToCartBtn = () => {
-    return (
-      addToCart && (
+    if (addToCart) {
+      return (
         <button
-          onClick={addToCart}
+          onClick={handleAddToCart}
           className="btn btn-block btn-outline-success mt-2 mb-2"
         >
           Add to Cart
         </button>
-      )
-    );
+      );
+    }
+    return null;
   };
 
   /**
-   * Function to show the Remove from Cart button.
-   * It checks the value of `removeFromCart` prop and conditionally renders the button.
+   * Handles the Remove from Cart button click event.
    */
-  const showRemoveFromCart = () => {
-    return (
-      removeFromCart && (
+  const handleRemoveFromCart = () => {
+    removeItemFromCart(product._id);
+  };
+
+  /**
+   * Renders the Remove from Cart button.
+   * @returns {JSX.Element|null} The Remove from Cart button JSX element, or null if removeFromCart prop is false.
+   */
+  const showRemoveFromCartBtn = () => {
+    if (removeFromCart) {
+      return (
         <button
-          onClick={() => {
-            removeItemFromCart(product._id); // Use the `removeItemFromCart` helper function to remove the product from the cart
-          }}
+          onClick={handleRemoveFromCart}
           className="btn btn-block btn-outline-danger mt-2 mb-2"
         >
           Remove from Cart
         </button>
-      )
-    );
+      );
+    }
+    return null;
   };
 
-  // Render the card component with the product information and buttons
   return (
     <div className="card text-white bg-dark border border-info">
       <div className="card-header lead">
@@ -95,7 +96,7 @@ const Card = ({ product, addtoCart = true, removeFromCart = true }) => {
         <p className="btn btn-success rounded btn-sm px-4">${product.price}</p>
         <div className="row">
           <div className="col-12">{showAddToCartBtn()}</div>
-          <div className="col-12">{showRemoveFromCart()}</div>
+          <div className="col-12">{showRemoveFromCartBtn()}</div>
         </div>
       </div>
     </div>
@@ -103,6 +104,7 @@ const Card = ({ product, addtoCart = true, removeFromCart = true }) => {
 };
 
 export default Card;
+
 
 
                 // The sum()

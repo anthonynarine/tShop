@@ -43,8 +43,8 @@ export default function Home() {
           products.map((product) => {
             return (
               <div key={product.id} className="col-4 mb-4">
-                {/* < Card product={product} /> context */}
-                < CardLocalStorage product={product} /> local storage
+                < Card product={product} /> context
+                {/* < CardLocalStorage product={product} /> local storage */}
               </div>
             );
           })

@@ -1,9 +1,9 @@
 /* eslint-disable no-lone-blocks */
 import React, { useContext } from "react";
-import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper";
+import { CartContext } from "./helper/CartContext";
+import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
 import ImageHelper from "./helper/imageHelper";
 import { useNavigate } from "react-router-dom";
-import { CartContext } from "./helper/CartContext";
 
 const isAuthenticated = true;
 
