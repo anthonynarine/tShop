@@ -28,7 +28,7 @@ export const CartProvider = ({ children }) => {
   //Adds an item to the cart
   // @param {object} item - The item being added to the cart
   const addToCart = (item) => {
-    dispatch({ type: "ADD_TO_Cart", payload: item });
+    dispatch({ type: "ADD_TO_CART", payload: item });
   };
 
   return (

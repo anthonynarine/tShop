@@ -1,20 +1,21 @@
 import { addItemToCart } from "./helper/cartHelper";
 import ImageHelper from "./helper/imageHelper";
 import { useNavigate } from "react-router-dom";
+import { CartContext } from "./helper/CartContext";
+import { useContext, useEffect } from "react";
 
 const isAuthenticated = true;
 
-const Card = ({ product, addToCart = true, removeFromCart = false }) => {
+const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
   const navigate = useNavigate();
 
-  // check if data is available
-  if (!product) {
-    return <div>Loading...</div>;
-  }
+  const { addToCart } = useContext(CartContext);
+  const { cart } = useContext(CartContext); //TEST TO CHECK CART STATE
 
   const handleAddToCart = () => {
     if (isAuthenticated) {
-      addItemToCart(product, ()=>{} )
+      // addItemToCart(product, ()=>{} )
+      addToCart(product);
       console.log("added to cart");
     } else {
       console.log("login please");
@@ -24,14 +25,14 @@ const Card = ({ product, addToCart = true, removeFromCart = false }) => {
 
   const showAddToCartBtn = () => {
     return (
-      handleAddToCart && (
-        <button
-          onClick={handleAddToCart}
-          className="btn btn-block btn-outline-success mt-2 mb-2"
-        >
-          Add to Cart
-        </button>
-      )
+      // handleAddToCart && (
+      <button
+        onClick={handleAddToCart}
+        className="btn btn-block btn-outline-success mt-2 mb-2"
+      >
+        Add to Cart
+      </button>
+      // )
     );
   };
 
@@ -40,7 +41,7 @@ const Card = ({ product, addToCart = true, removeFromCart = false }) => {
       removeFromCart && (
         <button
           onClick={() => {
-            console.log("Item removed")
+            console.log("Item removed");
           }}
           className="btn btn-block btn-outline-danger mt-2 mb-2"
         >
@@ -49,6 +50,11 @@ const Card = ({ product, addToCart = true, removeFromCart = false }) => {
       )
     );
   };
+
+  useEffect(() => {
+    // TEST - logs the cart state whenever the "cart" dependency changes
+    console.log("Cart State:", cart);
+  }, [cart]);
 
   return (
     <div className="card text-white bg-dark border border-info ">

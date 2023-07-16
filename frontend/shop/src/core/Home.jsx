@@ -6,6 +6,7 @@ import Card from "./Card";
 
 import "../styles.css";
 
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
@@ -32,6 +33,7 @@ export default function Home() {
   if (error) {
     return <div>Error: {error.message}</div>;
   }
+
 
   return (
     <Base title="Home page" description="Welcome to The shop">
