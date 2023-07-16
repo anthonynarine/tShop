@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { baseUrl } from "./shared";
 import Base from "./Base";
 import Card from "./Card";
+import CardLocalStorage from "./components/CardLocalStorage"
 
 import "../styles.css";
 
@@ -42,7 +43,8 @@ export default function Home() {
           products.map((product) => {
             return (
               <div key={product.id} className="col-4 mb-4">
-                < Card product={product} />
+                {/* < Card product={product} /> context */}
+                < CardLocalStorage product={product} /> local storage
               </div>
             );
           })

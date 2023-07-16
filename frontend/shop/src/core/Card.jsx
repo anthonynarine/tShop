@@ -1,6 +1,6 @@
 /* eslint-disable no-lone-blocks */
 import React, { useContext } from "react";
-import { addItemToCart } from "./helper/cartHelper";
+import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper";
 import ImageHelper from "./helper/imageHelper";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "./helper/CartContext";
@@ -19,8 +19,7 @@ const Card = ({ product }) => {
 
   const handleAddToCart = () => {
     if (isAuthenticated) {
-      // addItemToCart(product, ()=>{} )
-      addToCart(product);
+      addToCart(product); // context
       console.log("added to cart");
     } else {
       console.log("login please");
@@ -35,14 +34,14 @@ const Card = ({ product }) => {
 
   const showAddToCartBtn = () => {
     return (
-      // handleAddToCart && (
+      handleAddToCart && (
       <button
         onClick={handleAddToCart}
         className="btn btn-block btn-outline-success mt-2 mb-2"
       >
         Add to Cart
       </button>
-      // )
+      )
     );
   };
 
@@ -51,7 +50,7 @@ const Card = ({ product }) => {
     if(cart.some((item)=> item.id === product.id))
     // Note on some function below
     return (
-      removeFromCart && (
+      removeFromCart  && (
         <button
           onClick={handleRemoveFromCart}
           className="btn btn-block btn-outline-danger mt-2 mb-2"

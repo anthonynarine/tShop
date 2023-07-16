@@ -15,8 +15,11 @@ let cartReducer = (state, action) => {
 // checks if the id of each item in the state is not equal to the
 // id of the item to be removed a new array is created w/0 the the remoed item
       return state.filter(item => item.id !== action.payload.id)
+
+    case "EMPTY_CART":
+      return []
     default:
-      return state;
+      return state;    
   }
 };
 
@@ -44,8 +47,13 @@ export const CartProvider = ({ children }) => {
     dispatch({type: "REMOVE_FROM_CART", payload: item});
   }
 
+  // Empties the cart by removing all items.
+  const emptyCart = (item) => {
+    dispatch({type: "EMPTY_CART", payload: item});
+  }
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, emptyCart }}>
       {console.log("CART STATE:",cart)}
       {children}
     </CartContext.Provider>
@@ -57,7 +65,7 @@ export const CartProvider = ({ children }) => {
 
 
                 // Reducer Notes
-                
+
 {/*The cart reducer function is responsible for updating the cart 
 state based on the dispatched actions. It takes in the current 
 state (state) and an action object (action) as input parameters.
