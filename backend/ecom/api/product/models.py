@@ -2,6 +2,7 @@
 from django.db import models
 from api.category.models import Category
 from django.core.exceptions import ValidationError
+import uuid
 
 def validate_positive(value):
     """ if value is less than or equal to 0, we raise a ValidationError"""
@@ -11,6 +12,7 @@ def validate_positive(value):
     
 # Create your models here.
 class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=250)

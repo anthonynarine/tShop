@@ -7,7 +7,7 @@ import uuid
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = None
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, default="Anonymous")
     email = models.EmailField(max_length=100, unique=True)
 
