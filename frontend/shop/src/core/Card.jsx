@@ -1,8 +1,8 @@
+import React, { useContext } from "react";
 import { addItemToCart } from "./helper/cartHelper";
 import ImageHelper from "./helper/imageHelper";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "./helper/CartContext";
-import { useContext, useEffect } from "react";
 
 const isAuthenticated = true;
 
@@ -10,7 +10,11 @@ const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
   const navigate = useNavigate();
 
   const { addToCart } = useContext(CartContext);
-  const { cart } = useContext(CartContext); //TEST TO CHECK CART STATE
+
+  // check if data is available
+  if (!product) {
+    return <div>Loading...</div>;
+  }
 
   const handleAddToCart = () => {
     if (isAuthenticated) {
@@ -50,11 +54,6 @@ const Card = ({ product, addtoCart = true, removeFromCart = false }) => {
       )
     );
   };
-
-  useEffect(() => {
-    // TEST - logs the cart state whenever the "cart" dependency changes
-    console.log("Cart State:", cart);
-  }, [cart]);
 
   return (
     <div className="card text-white bg-dark border border-info ">

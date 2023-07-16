@@ -33,6 +33,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider value={{ cart, addToCart }}>
+      {console.log("CART STATE:",cart)}
       {children}
     </CartContext.Provider>
   );
