@@ -10,16 +10,33 @@ let cartReducer = (state, action) => {
   switch (action.type) {
     case "ADD_TO_CART":
       return [...state, action.payload];
-    
+
     case "REMOVE_FROM_CART":
-// checks if the id of each item in the state is not equal to the
-// id of the item to be removed a new array is created w/0 the the remoed item
-      return state.filter(item => item.id !== action.payload.id)
+      // checks if the id of each item in the state is not equal to the
+      // id of the item to be removed a new array is created w/0 the the remoed item
+      return state.filter((item) => item.id !== action.payload.id);
 
     case "EMPTY_CART":
-      return []
+      return [];
+
+    //  * Authenticates the user and stores the token in the cart state.
+    //  * @param {string} action.payload - The token obtained from the authentication process.
+    //  * @returns {object} The updated cart state.
+    case "AUTHENTICATE":
+      return { isAuthenticated: true, token: action.payload };
+
+    //  * Sets the authentication status in the cart state.
+    //  * @param {boolean} action.payload - The authentication status.
+    //  * @returns {object} The updated cart state.
+    case "IS_AUTHENTICATED":
+      return { ...state, isAuthenticated: action.payload };
+
+    case "SIGN_OUT":
+      return initialState;
+      //initial start is an empty array lol. 
+
     default:
-      return state;    
+      return state;
   }
 };
 
@@ -33,8 +50,7 @@ export const CartContext = createContext();
 // @return {ReactNode} The CartProvider component
 export const CartProvider = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
-// dispatch() is responsible for updating state
-
+  // dispatch() is responsible for updating state
 
   //Adds an item to the cart
   // @param {object} item - The item being added to the cart
@@ -44,29 +60,62 @@ export const CartProvider = ({ children }) => {
 
   // Remove an item from the cart
   const removeFromCart = (item) => {
-    dispatch({type: "REMOVE_FROM_CART", payload: item});
-  }
+    dispatch({ type: "REMOVE_FROM_CART", payload: item });
+  };
 
   // Empties the cart by removing all items.
   const emptyCart = (item) => {
-    dispatch({type: "EMPTY_CART", payload: item});
-  }
+    dispatch({ type: "EMPTY_CART", payload: item });
+  };
+
+
+  //  * Authenticates the user and stores the token in the cart state.
+  //  * @param {string} token - The token obtained from the user object.
+  const authenticate = (token) => {
+    dispatch({ type: "AUTHENTICATE", payload: token });
+  };
+
+  
+  //  * Sets the authentication status in the cart state.
+  //  * @param {boolean} isAuthenticated - The authentication status.
+  const setAuthenticated = (isAuthenticated) => {
+    dispatch({ type: "IS_AUTHENTICATED", payload: isAuthenticated });
+  };
+
+
+//  * Action creator function for the sign out action.
+//  * @returns {Object} The sign out action object.
+const signOut = () => {
+  return { type: "SIGN_OUT" };
+};
+
+
+
+  // Create the cart context value
+  const cartContextValue = {
+    cart,
+    addToCart,
+    removeFromCart,
+    emptyCart,
+    authenticate,
+    setAuthenticated,
+    signOut, 
+  };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, emptyCart }}>
-      {console.log("CART STATE:",cart)}
+    <CartContext.Provider value={cartContextValue}>
+      {console.log("CART STATE:", cart)}
       {children}
     </CartContext.Provider>
   );
 };
 
-
 // SEE Router.jsx for how CartProvider wraps the application
 
+// Reducer Notes
 
-                // Reducer Notes
-
-{/*The cart reducer function is responsible for updating the cart 
+{
+  /*The cart reducer function is responsible for updating the cart 
 state based on the dispatched actions. It takes in the current 
 state (state) and an action object (action) as input parameters.
 
@@ -127,4 +176,5 @@ By wrapping components in the CartProvider and rendering them within
  and actions are provided to the child components. This enables components
 within the CartProvider hierarchy to access and manipulate the cart state
 and trigger actions such as adding items to the cart.
-*/}
+*/
+}
