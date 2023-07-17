@@ -1,7 +1,8 @@
 /* eslint-disable no-lone-blocks */
 import React, { useState } from "react";
-import { API } from "../backend";
+import { baseUrl } from "../core/shared";
 import Base from "../core/Base";
+import { Link } from "react-router-dom";
 
 function SignUp() {
   //State
@@ -29,7 +30,7 @@ function SignUp() {
     setValues({ ...values, error: false, success: false });
     try {
       // Send a POST request to the signup API endpoint
-      const response = await fetch("http://localhost:8000/api/user/", {
+      const response = await fetch(`${baseUrl}/api/user/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,12 +48,43 @@ function SignUp() {
 
       // Parse the response data as JSON
       const data = await response.json();
-      console.log("Data:", data);
+      console.log("NEW_USER_DATA:", data);
       setValues({ ...values, success: true });
     } catch (error) {
       console.error("Error occurred during signup:", error);
-      setValues({...values, error: 'Signup Failed: Ensure a valid Name, Email and Password was provided'})
+      setValues({
+        ...values,
+        error: "Check all fields",
+        success: false, // Reset success to false if there's an error
+      });
     }
+  };
+
+  // Function to render the error message
+  const errorMessage = () => {
+    if (error) {
+      return (
+        <div className="alert alert-danger text-center w-50 col-md-6 offset-sm-3 text-left">
+          {error}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Function to render the success message
+  const successMessage = () => {
+    if (success) {
+      return (
+        <div className="alert alert-success text-center w-50 col-md-6 offset-sm-3 text-left">
+          Signup successful!{" "}
+          <Link to={"/login"} style={{ textDecoration: "none" }}>
+            Login
+          </Link>
+        </div>
+      );
+    }
+    return null;
   };
 
   let signUpForm = () => {
@@ -98,8 +130,8 @@ function SignUp() {
 
   return (
     <Base title="Create Account" description="create your account">
-      {error && <div className="alert alert-danger text-center w-50 col-md-6 offset-sm-3 text-left ">{error}</div>}
-      {success && <div className="alert alert-success text-center w-50 col-md-6 offset-sm-3 text-left ">Signup successful!</div>}
+      {error && errorMessage()}
+      {success && successMessage()}
       {signUpForm()}
       <p className="text-white text-center">{JSON.stringify(values)}</p>
     </Base>
