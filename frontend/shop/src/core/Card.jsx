@@ -10,7 +10,7 @@ const isAuthenticated = true;
 const Card = ({ product }) => {
   const navigate = useNavigate();
 
-  const { addToCart, removeFromCart, cart } = useContext(CartContext);
+  const { addToCart, removeFromCart,  cart } = useContext(CartContext);
 
   // check if data is available
   if (!product) {
@@ -47,7 +47,7 @@ const Card = ({ product }) => {
 
   const showRemoveFromCart = () => {
   // conditionally renders btn based on the presence of an iteam in the cart context state
-    if(cart.some((item)=> item.id === product.id))
+    if(cart.cartItems.some((item)=> item.id === product.id))
     // Note on some function below
     return (
       removeFromCart  && (

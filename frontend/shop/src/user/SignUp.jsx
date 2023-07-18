@@ -25,7 +25,7 @@ function SignUp() {
     setValues({ ...values, error: false, [name]: event.target.value });
   };
 
-  const register = async (event) => {
+  async function register(event) {
     event.preventDefault();
     setValues({ ...values, error: false, success: false });
     try {
