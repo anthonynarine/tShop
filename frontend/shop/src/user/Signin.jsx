@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { CartContext, useCart } from "../core/helper/CartContext"; 
+import { CartContext, useCart } from "../core/helper/CartContext";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
@@ -18,8 +18,8 @@ function SignIn() {
 
   // Function to handle changes in form input fields
 
-  const handleChange = (key)=> (event) => {
-    setValues({ ...values, error: false, [key]: event.target.value  });
+  const handleChange = (keyName) => (event) => {
+    setValues({ ...values, error: false, [keyName]: event.target.value });
   };
 
   // Access the CartContext value, which includes the dispatch function WITHOUT THE CUSTOM HOOK
@@ -27,13 +27,11 @@ function SignIn() {
   // const { dispatch, cart } = cartContextValue;
 
   // Access the dispatch function using the custom hook useCart (see CartContext)
-  const { dispatch, cart, } = useCart(); // WITH CUSTOM HOOK
+  const { dispatch, cart } = useCart(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request
-  useEffect(()=>{
-    console.log("CART STATE UPDATED:", cart)
-  },[cart])
+
   async function login(event) {
     event.preventDefault();
     // Set loading to true before making the API request
@@ -62,16 +60,16 @@ function SignIn() {
       const data = await response.json();
       console.log("Logged_in_user_data:", data);
       //Stores the token that comes with the user object as the token value in initial state
-      if (data.token){
-      dispatch({ type: "AUTHENTICATE", payload: data.token });
-      //Toggles isAuthenticated from false to true in initial state
-      dispatch({ type: "SET_AUTHENTICATED", payload: true });
+      if (data.token) {
+        dispatch({ type: "AUTHENTICATE", payload: data.token });
+        //Toggles isAuthenticated from false to true in initial state
+        dispatch({ type: "SET_AUTHENTICATED", payload: true });
+      }else {
+        console.log("session exist")
+      }
 
-      console.log("Cart state after request:", cart)
-    }
-
-      // Set loading to false, success to true, and didRedirect to true after successful login
-      setValues({ ...values, loading: false, success: true });
+       // Clear form data upon successful login
+      setValues({ email:"", password: "", error:"", loading: false, success: true });
       // console.log("CART_STATE_UPDATED:", cart)
       // navigate("/dashboard")
     } catch (error) {
@@ -80,6 +78,11 @@ function SignIn() {
       setValues({ ...values, loading: false, success: false });
     }
   }
+
+  // TEST
+  useEffect(() => {
+    console.log("CART STATE UPDATED:", cart);
+  }, [cart]);
 
   // Function to render the error message
   const errorMessage = () => {
@@ -98,10 +101,10 @@ function SignIn() {
     if (success) {
       return (
         <div className="alert alert-success text-center w-50 col-md-6 offset-sm-3 text-left">
-          Signup successful!{" "}
-          <Link to={"/login"} style={{ textDecoration: "none" }}>
+          Login successful!{" "}
+          {/* <Link to={"/login"} style={{ textDecoration: "none" }}>
             Login
-          </Link>
+          </Link> */}
         </div>
       );
     }

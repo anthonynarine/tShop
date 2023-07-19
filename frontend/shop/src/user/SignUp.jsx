@@ -21,8 +21,8 @@ function SignUp() {
   //    * Updates the state values based on the input field name.
   //    * @param {string} name - The name of the input field.
   //    * @param {object} event - The event object triggered by the input field.
-  const handleChange = (name) => (event) => {
-    setValues({ ...values, error: false, [name]: event.target.value });
+  const handleChange = (KeyName) => (event) => {
+    setValues({ ...values, error: false, [KeyName]: event.target.value });
   };
 
   async function register(event) {
