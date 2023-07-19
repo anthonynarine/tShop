@@ -6,8 +6,8 @@ import { baseUrl } from "../core/shared";
 
 function SignIn() {
   const [values, setValues] = useState({
-    email: "julia@gmail.com",
-    password: "lakers2020",
+    email: "",
+    password: "",
     error: "",
     success: false,
     loading: false,
@@ -45,9 +45,9 @@ function SignIn() {
         formData.append(name, values[name]);
       }
 
-      // Log the keys present in formData
+      // TEST Log the keys present in formData
       for (const key of formData.keys()) {
-        console.log("KEY_NAME", key);
+        console.log("TEST_KEY_NAME", key);
       }
 
       const response = await fetch(`${baseUrl}/api/user/login/`, {
@@ -58,7 +58,7 @@ function SignIn() {
         throw new Error("something went wrong");
       }
       const data = await response.json();
-      console.log("Logged_in_user_data:", data);
+      console.log("TEST_Logged_in_user_data:", data);
       //Stores the token that comes with the user object as the token value in initial state
       if (data.token) {
         dispatch({ type: "AUTHENTICATE", payload: data.token });
@@ -71,7 +71,7 @@ function SignIn() {
        // Clear form data upon successful login
       setValues({ email:"", password: "", error:"", loading: false, success: true });
       // console.log("CART_STATE_UPDATED:", cart)
-      // navigate("/dashboard")
+      navigate("/")
     } catch (error) {
       console.error(error);
       // Set loading to false and success to false in case of error
@@ -81,7 +81,7 @@ function SignIn() {
 
   // TEST
   useEffect(() => {
-    console.log("CART STATE UPDATED:", cart);
+    console.log("TEST_STATE_Signin:", cart);
   }, [cart]);
 
   // Function to render the error message

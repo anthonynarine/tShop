@@ -129,7 +129,7 @@ const signOut = () => {
 
   return (
     <CartContext.Provider value={cartContextValue}>
-      {console.log("CART STATE:", cart)}
+      {console.log("TEST_STATE_CartContext :", cart)} 
       {children}
     </CartContext.Provider>
   );
