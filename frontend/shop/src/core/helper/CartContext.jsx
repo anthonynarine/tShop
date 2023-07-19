@@ -1,5 +1,22 @@
 /* eslint-disable no-lone-blocks */
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useReducer, useContext } from "react";
+
+
+// See Signin and card component for a demo use case
+// Create a custom hook 'useCart'
+// Custom hook to access the CartContext and retrieve cart state and actions.
+// @returns {Object} The cart context value containing the cart state and actions.
+// @throws {Error} If used outside the CartProvider component.
+export const useCart = () => {
+  const cartContextValue = useContext(CartContext);
+
+  if (!cartContextValue) {
+    throw new Error(
+      "useCart must be used within a CartProvider. Make sure to wrap your component with the CartProvider."
+    );
+  }
+  return cartContextValue;
+};
 
 
 //Initial cart state
@@ -79,15 +96,15 @@ export const CartProvider = ({ children }) => {
   //  * @param {string} token - The token obtained from the user object.
   const authenticate = (token) => {
     dispatch({ type: "AUTHENTICATE", payload: token });
-    {/* will dispatch the AUTHENTICATE action to the cart reducer. it takes 
-        token as an argument & sends it as the 'payload' w/ the "AUTHENTICATE"
-        action type. when called it will update the cart state w/ the provided token
-        and set the "isAuthenticated flag to "true" */}
+    /* will dispatch the AUTHENTICATE action to the cart reducer. it takes
+     token as an argument & sends it as the 'payload' w/ the "AUTHENTICATE"
+     action type. when called it will update the cart state w/ the provided token
+     and set the "isAuthenticated" flag to "true" */
   };
 
   //  * @param {boolean} isAuthenticated - The authentication status.
   const setAuthenticated = (isAuthenticated) => {
-    dispatch({ type: "IS_AUTHENTICATED", payload: isAuthenticated });
+    dispatch({ type: "SET_AUTHENTICATED", payload: isAuthenticated });
   };
 
 //  * Action creator function for the sign out action.
@@ -99,13 +116,16 @@ const signOut = () => {
   // Create the cart context value
   const cartContextValue = {
     cart,
+    dispatch,
     addToCart,
     removeFromCart,
     emptyCart,
     authenticate,
     setAuthenticated,
-    signOut, 
+    signOut,
   };
+
+
 
   return (
     <CartContext.Provider value={cartContextValue}>

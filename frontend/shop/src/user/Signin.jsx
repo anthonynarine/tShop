@@ -1,27 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { CartContext, useCart } from "../core/helper/CartContext"; 
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
-
+import { baseUrl } from "../core/shared";
 
 function SignIn() {
-
-    const [values, setValues] = useState({
-    email: "",
-    password: "",
+  const [values, setValues] = useState({
+    email: "julia@gmail.com",
+    password: "lakers2020",
     error: "",
     success: false,
     loading: false,
-    didRedirect: false,
   });
 
-  const { email, password, error, success, loading, didRedirect } = values;
+  // Destructure the values state for convenience
+  const { email, password, error, success, loading } = values;
 
-  const handleChange = (name) => (event) => {
-    setValues({ ...values, error: false, [name]: event.target.value });
+  // Function to handle changes in form input fields
+
+  const handleChange = (key)=> (event) => {
+    setValues({ ...values, error: false, [key]: event.target.value  });
   };
 
+  // Access the CartContext value, which includes the dispatch function WITHOUT THE CUSTOM HOOK
+  // const cartContextValue = useContext(CartContext);
+  // const { dispatch, cart } = cartContextValue;
+
+  // Access the dispatch function using the custom hook useCart (see CartContext)
+  const { dispatch, cart, } = useCart(); // WITH CUSTOM HOOK
+  const navigate = useNavigate();
+
+  // Function to handle the login request
+  useEffect(()=>{
+    console.log("CART STATE UPDATED:", cart)
+  },[cart])
   async function login(event) {
     event.preventDefault();
+    // Set loading to true before making the API request
+    setValues({ ...values, error: false, loading: true });
+
+    try {
+      const formData = new FormData();
+      // Append the email and password to the FormData object
+      // name is the name of the key || will only add the form input value keys
+      for (const name in values) {
+        formData.append(name, values[name]);
+      }
+
+      // Log the keys present in formData
+      for (const key of formData.keys()) {
+        console.log("KEY_NAME", key);
+      }
+
+      const response = await fetch(`${baseUrl}/api/user/login/`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error("something went wrong");
+      }
+      const data = await response.json();
+      console.log("Logged_in_user_data:", data);
+      //Stores the token that comes with the user object as the token value in initial state
+      if (data.token){
+      dispatch({ type: "AUTHENTICATE", payload: data.token });
+      //Toggles isAuthenticated from false to true in initial state
+      dispatch({ type: "SET_AUTHENTICATED", payload: true });
+
+      console.log("Cart state after request:", cart)
+    }
+
+      // Set loading to false, success to true, and didRedirect to true after successful login
+      setValues({ ...values, loading: false, success: true });
+      // console.log("CART_STATE_UPDATED:", cart)
+      // navigate("/dashboard")
+    } catch (error) {
+      console.error(error);
+      // Set loading to false and success to false in case of error
+      setValues({ ...values, loading: false, success: false });
+    }
   }
 
   // Function to render the error message
@@ -85,6 +142,8 @@ function SignIn() {
 
   return (
     <Base title="Signin page" description="the place you signin">
+      {errorMessage()}
+      {successMessage()}
       {signInForm()}
       <p className="text-white text-center">{JSON.stringify(values)}</p>
     </Base>

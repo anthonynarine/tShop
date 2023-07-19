@@ -1,6 +1,6 @@
 /* eslint-disable no-lone-blocks */
 import React, { useContext } from "react";
-import { CartContext } from "./helper/CartContext";
+import { CartContext, useCart } from "./helper/CartContext";
 import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
 import ImageHelper from "./helper/imageHelper";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,8 @@ const isAuthenticated = true;
 const Card = ({ product }) => {
   const navigate = useNavigate();
 
-  const { addToCart, removeFromCart,  cart } = useContext(CartContext);
+  // const { addToCart, removeFromCart, cart } = useContext(CartContext); WITHOUT CUSTOM HOOK
+  const { addToCart, removeFromCart, cart } = useCart();  // W/ custom hook useCart (see CartContext)
 
   // check if data is available
   if (!product) {
