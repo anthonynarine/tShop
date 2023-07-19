@@ -54,7 +54,7 @@ export const loadCart = () => {
  * @param {string} productID - The ID of the product to be deleted.
  * @returns {Array|null} The updated cart with the specified item removed, or null if cart not found.
  */
-export const removeItemFromCart = (productID) => {
+export const deleteItemFromCart = (productID) => {
   // Initialize cart as an empty array
   let cart = [];
 
