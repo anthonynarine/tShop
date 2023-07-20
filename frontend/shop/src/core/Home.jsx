@@ -36,17 +36,19 @@ export default function Home() {
   return (
     <Base title="Home page" description="Welcome to The shop">
       <div className="row py-4">
-        {products ? (
-          products.map((product) => {
-            return (
-              <div key={product.id} className="col-4 mb-4">
-                < Card product={product} />
-              </div>
-            );
-          })
-        ) : (
-          <p>No data available</p>
-        )}
+        <div name="PRODUCT DISPLAY" className=" d-flex justify-content-center" >
+          {products ? (
+            products.map((product) => {
+              return (
+                <div key={product.id} className="col-4 mb-4">
+                  <Card product={product} />
+                </div>
+              );
+            })
+          ) : (
+            <p>No data available</p>
+          )}
+        </div>
       </div>
     </Base>
   );
