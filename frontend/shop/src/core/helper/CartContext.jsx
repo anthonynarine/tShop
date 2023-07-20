@@ -116,6 +116,9 @@ const signOut = () => {
   // Create the cart context value
   const cartContextValue = {
     cart,
+    isAuthenticated: cart.isAuthenticated,
+    token: cart.token,
+    cartItems: cart.cartItems,
     dispatch,
     addToCart,
     removeFromCart,

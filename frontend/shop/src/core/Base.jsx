@@ -1,4 +1,6 @@
 import React from "react";
+import NavBar from "./NavBar";
+import { CartProvider } from "./helper/CartContext";
 
 export default function Base({
   title = "My Title",
@@ -7,6 +9,8 @@ export default function Base({
   children,
 }) {
   return (
+    <CartProvider>
+    {/* <NavBar /> */}
     <div className="page-container">
       <div className="content-container">
         <div className="container-fluid">
@@ -27,5 +31,6 @@ export default function Base({
         </div>
       </footer>
     </div>
+    </CartProvider>
   );
 }

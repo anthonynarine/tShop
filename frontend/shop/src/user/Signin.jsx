@@ -27,7 +27,7 @@ function SignIn() {
   // const { dispatch, cart } = cartContextValue;
 
   // Access the dispatch function using the custom hook useCart (see CartContext)
-  const { dispatch, cart } = useCart(); // WITH CUSTOM HOOK
+  const { dispatch, cart, isAuthenticated } = useCart(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request
@@ -64,14 +64,14 @@ function SignIn() {
         dispatch({ type: "AUTHENTICATE", payload: data.token });
         //Toggles isAuthenticated from false to true in initial state
         dispatch({ type: "SET_AUTHENTICATED", payload: true });
-      }else {
-        console.log("session exist")
+      } else {
+        console.log("session exist");
       }
 
-       // Clear form data upon successful login
-      setValues({ email:"", password: "", error:"", loading: false, success: true });
+      // Clear form data upon successful login
+      setValues({ email: "", password: "", error: "", loading: false, success: true });
       // console.log("CART_STATE_UPDATED:", cart)
-      navigate("/")
+      navigate("/");
     } catch (error) {
       console.error(error);
       // Set loading to false and success to false in case of error
@@ -82,6 +82,7 @@ function SignIn() {
   // TEST
   useEffect(() => {
     console.log("TEST_STATE_Signin:", cart);
+    console.log(isAuthenticated)
   }, [cart]);
 
   // Function to render the error message
