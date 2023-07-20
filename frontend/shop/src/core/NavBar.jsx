@@ -37,6 +37,11 @@ function NavBar() {
             Cart
           </Link>
         </li>
+        <li className="nav-item">
+          <Link style={currentTab("/signup")} className="nav-link" to="/signup">
+            Signup
+          </Link>
+        </li>
         {/* Conditional rendering of Signin link */}
         {isAuthenticated ? (
           // If the user is signed in, render the Signout link
@@ -50,24 +55,20 @@ function NavBar() {
                 navigate("/signin");
               }}
             >
-              Signout
+              LogOut
             </Link>
           </li>
         ) : (
           // If the user is not signed in, render the Signin link
           <li className="nav-item">
             <Link style={currentTab("/signin")} className="nav-link" to="/signin">
-              Signin
+              LogIn
             </Link>
           </li>
         )}
         {/* Signup link */}
-        <li className="nav-item">
-          <Link style={currentTab("/signup")} className="nav-link" to="/signup">
-            Signup
-          </Link>
-        </li>
-        <li>{console.log(isloggedin)}</li>
+
+        <li >{console.log(isloggedin)}</li>
       </ul>
     </div>
   );
