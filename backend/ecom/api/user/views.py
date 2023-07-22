@@ -9,8 +9,11 @@ import re
 import secrets
 import random
 import string
-import Respon
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -54,9 +57,23 @@ def generate_session_token(length=10):
 @authentication_classes([TokenAuthentication])  # Add the desired authentication class
 @permission_classes([AllowAny])
 def login_user(request):
-    """Sign in functionality"""
+    """
+     Sign in functionality for users.
+
+    This function allows users to sign in by providing their email and password.
+    It validates the provided email format and checks the password for authentication.
+    If the login is successful, a session token is generated for the user, and they are logged in.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: JSON response containing the session token and user information on successful login.
+                 Error response if the request method is not POST or if the login fails.
+
+    """
     print("Received login request.")
-    
+
     if request.method != "POST":
         return Response({"error": "Send a POST request with valid parameters only"})
 
@@ -98,10 +115,25 @@ def login_user(request):
         return Response({"error": "Invalid email"})
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def logout_user(request, id):
+    """
+    Log out functionality for users.
+
+    This function allows users to log out by providing their user ID (UUID).
+    It ends the user's session by using Django's built-in logout function.
+    The user's session token is reset to "0" after logging out.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+        id (str): The user's ID (UUID) to identify the user to log out.
+
+    Returns:
+        Response: JSON response with a success message if the user is successfully logged out.
+                 Error response if the user with the provided ID is not found.
+
+    """
     print("Found user ID is:", id)
-    # Log out the user using Django's built-in logout function
     logout(request)
 
     UserModel = get_user_model()
@@ -109,14 +141,12 @@ def logout_user(request, id):
     try:
         user = UserModel.objects.get(pk=id)
         print("Found user:", user)
-        user.session_token = "0" # Reset the session token to "0" when logging out
+        user.session_token = "0"  # Reset the session token to "0" when logging out
         user.save()
     except UserModel.DoesNotExist:
         return Response({"error": "Invalid user ID"})
 
     return Response({"success": f"Logged out user with ID {id}"}, status=200)
-
-
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -1,11 +1,13 @@
 import React from "react";
-import { useCart } from "./helper/CartContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./helper/AuthContext";
 
 function NavBar() {
   let location = useLocation();
   let navigate = useNavigate();
-
+  const { isAuthenticated, signOut } = useAuth(); // Get the isAuthenticated value and the signOut function from the useAuth hook
+  console.log("isAuthenticated", isAuthenticated, "from navbar")
+  
   /**
    * Function to determine the current tab style based on the route path.
    * @param {object} location - The current location object from the `useLocation` hook.
@@ -20,7 +22,10 @@ function NavBar() {
     }
   };
 
-  let { signOut, isAuthenticated } = useCart();
+  let handleLogout = () => {
+    signOut();
+    navigate("/signin");
+  };
 
   return (
     <div>
@@ -41,38 +46,27 @@ function NavBar() {
           </Link>
         </li>
         {/* Conditional rendering of Signin link */}
-        {isAuthenticated ? (
-          // If the user is signed in, render the Signout link
-          <li className="nav-item">
-            <Link
-              style={{ cursor: "pointer", ...currentTab("/signin") }}
-              className="nav-link text-warning"
-              to="/signin"
-              onClick={() => {
-                signOut(()=>{
-                  return (
-                    <div className="alert alert-success text-center w-50 col-md-6 offset-sm-3 text-left">
-                      Logout successful!
-
-                    </div>
-                  )
-                });
-                navigate("/signin");
-              }}
-            >
-              LogOut
-            </Link>
-          </li>
-        ) : (
+        {!isAuthenticated ? (
           // If the user is not signed in, render the Signin link
           <li className="nav-item">
             <Link style={currentTab("/signin")} className="nav-link" to="/signin">
               LogIn
             </Link>
           </li>
+        ) : (
+          // If the user is signed in, render the Signout link
+          <li className="nav-item">
+            <Link
+              style={{ cursor: "pointer", ...currentTab("/signin") }}
+              className="nav-link text-warning"
+              to="/signin"
+              onClick={handleLogout}
+            >
+              LogOut
+            </Link>
+          </li>
         )}
         {/* Signup link */}
-
       </ul>
     </div>
   );

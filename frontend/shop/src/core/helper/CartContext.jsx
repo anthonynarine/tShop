@@ -1,7 +1,6 @@
 /* eslint-disable no-lone-blocks */
 import React, { createContext, useReducer, useContext } from "react";
 
-
 // See Signin and card component for a demo use case
 // Create a custom hook 'useCart'
 // Custom hook to access the CartContext and retrieve cart state and actions.
@@ -18,48 +17,27 @@ export const useCart = () => {
   return cartContextValue;
 };
 
-
 //Initial cart state
 const initialState = {
   cartItems: [],
-  isAuthenticated: false,
-  token: null,
-  id: null, 
-}
-
+};
 //Cart Reducer - updates cart state based on dispatched actions
 // see more notes on this reducer below
 let cartReducer = (state, action) => {
   switch (action.type) {
     case "ADD_TO_CART":
-      return {...state, cartItems: [...state.cartItems, action.payload]};
+      return { ...state, cartItems: [...state.cartItems, action.payload] };
 
     case "REMOVE_FROM_CART":
-/*  filter => creates a new array that includes all the items except
+      /*  filter => creates a new array that includes all the items except
   the one with the id matching action.payload.id */
-      return{...state, cartItems: state.cartItems.filter((item) => item.id !== action.payload.id)};
+      return {
+        ...state,
+        cartItems: state.cartItems.filter((item) => item.id !== action.payload.id),
+      };
 
     case "EMPTY_CART":
       return { ...state, cartItems: [] };
-
-    // Authenticates the user and stores the token in the cart state.
-    // @param {string} action.payload - The token obtained from the authentication process.
-    // @returns {object} The updated cart state.
-    case "AUTHENTICATE":
-      return { ...state, isAuthenticated: true, token: action.payload };
-
-    // Sets the authentication status in the cart state.
-    // @param {boolean} action.payload - The authentication status.
-    // @returns {object} The updated cart state.
-    case "SET_AUTHENTICATED":
-      return { ...state, isAuthenticated: action.payload };
-
-    case "SET_USER_ID":
-      return {...state, userId: action.payload}
-
-    case "SIGN_OUT":
-      return initialState;
-      //initial start is an empty array lol. 
 
     default:
       return state;
@@ -68,7 +46,6 @@ let cartReducer = (state, action) => {
 
 //Create the cart context (Context Object)
 export const CartContext = createContext();
-
 
 //            ACTION CREATOR FUNCTIONS:
 
@@ -81,77 +58,44 @@ export const CartProvider = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
   // dispatch() is responsible for updating state
 
+  // SHOW CURRENT VALUE(S) OF STATE IN CART
+  console.log("cart STATE Values :", cart);
+
   //Adds an item to the cart
   // @param {object} item - The item being added to the cart
-  const addToCart = (item) => {
+  const addToCartAction = (item) => {
     dispatch({ type: "ADD_TO_CART", payload: item });
   };
 
   // Remove an item from the cart
-  const removeFromCart = (item) => {
+  const removeFromCartAction = (item) => {
     dispatch({ type: "REMOVE_FROM_CART", payload: item });
   };
 
   // Empties the cart by removing all items.
-  const emptyCart = (item) => {
+  const emptyCartAction = (item) => {
     dispatch({ type: "EMPTY_CART", payload: item });
   };
 
-  //  * @param {string} token - The token obtained from the user object.
-  const authenticate = (token) => {
-    console.log("Updating token state...");
-    dispatch({ type: "AUTHENTICATE", payload: token });
-    /* will dispatch the AUTHENTICATE action to the cart reducer. it takes
-     token as an argument & sends it as the 'payload' w/ the "AUTHENTICATE"
-     action type. when called it will update the cart state w/ the provided token
-     and set the "isAuthenticated" flag to "true" */
-  };
-
-
-  //  * @param {boolean} isAuthenticated - The authentication status.
-  const setAuthenticated = (isAuthenticated) => {
-    console.log("Updating isAuthentifcated...");
-    if(isAuthenticated === true){
-      console.log(isAuthenticated)
-    }
-    dispatch({ type: "SET_AUTHENTICATED", payload: isAuthenticated });
-  };
-
-//  * Action creator function for the sign out action.
-//  * @returns {Object} The sign out action object.
-const signOut = () => {
-  console.log("Executing signOut function...");
-  // Clear the token from session storage
-  sessionStorage.removeItem("token");
-  dispatch({ type: "SIGN_OUT" });
-  console.log("Executing signOut function...");
-};
-
-
+  //..
 
   // Create the cart context value
   const cartContextValue = {
-    isAuthenticated: cart.isAuthenticated,
-    token: cart.token,
-    cartItems: cart.cartItems,
+    cart,
     dispatch,
-    addToCart,
-    removeFromCart,
-    emptyCart,
-    authenticate,
-    setAuthenticated,
-    signOut,
+    addToCartAction,
+    removeFromCartAction,
+    emptyCartAction,
   };
-
-
 
   return (
     <CartContext.Provider value={cartContextValue}>
-      {console.log("TEST_STATE_CartContext :", cart)} 
       {children}
     </CartContext.Provider>
   );
 };
+
+//..
 
 // SEE Router.jsx for how CartProvider wraps the application
 

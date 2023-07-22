@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { CartContext, useCart } from "../core/helper/CartContext";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
+import { useAuth } from "../core/helper/AuthContext";
 
 function SignIn() {
   const [values, setValues] = useState({
@@ -27,7 +27,7 @@ function SignIn() {
   // const { dispatch, cart } = cartContextValue;
 
   // Access the dispatch function using the custom hook useCart (see CartContext)
-  const { dispatch, cart, isAuthenticated } = useCart(); // WITH CUSTOM HOOK
+  const { dispatch, cart, isAuthenticated } = useAuth(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request

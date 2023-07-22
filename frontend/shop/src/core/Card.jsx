@@ -1,17 +1,19 @@
 /* eslint-disable no-lone-blocks */
-import React, { useContext } from "react";
-import { CartContext, useCart } from "./helper/CartContext";
-import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
-import ImageHelper from "./helper/imageHelper";
-import { useNavigate } from "react-router-dom";
 
-const isAuthenticated = true;
+import React from "react";
+import { useCart } from "./helper/CartContext";
+import { useAuth } from "./helper/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ImageHelper from "./helper/imageHelper";
+import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
+
 
 const Card = ({ product }) => {
-  const navigate = useNavigate();
-
+  console.log("Product:", product);
   // const { addToCart, removeFromCart, cart } = useContext(CartContext); WITHOUT CUSTOM HOOK
-  const { addToCart, removeFromCart, cart } = useCart();  // W/ custom hook useCart (see CartContext)
+  const { addToCartAction, removeFromCartAction, cart } = useCart(); // W/ custom hook useCart (see CartContext)
+  const { isAuthenticated } = useAuth(); // Get the isAuthenticated value from the useAuth hook
+  const navigate = useNavigate();
 
   // check if data is available
   if (!product) {
@@ -20,7 +22,7 @@ const Card = ({ product }) => {
 
   const handleAddToCart = () => {
     if (isAuthenticated) {
-      addToCart(product); // context
+      addToCartAction(product); // context
       console.log("added to cart");
     } else {
       console.log("login please");
@@ -29,38 +31,44 @@ const Card = ({ product }) => {
   };
 
   const handleRemoveFromCart = () => {
-    removeFromCart(product);
+    removeFromCartAction(product);
     console.log("removed from cart");
   };
 
   const showAddToCartBtn = () => {
     return (
       handleAddToCart && (
-      <button
-        onClick={handleAddToCart}
-        className="btn btn-block btn-outline-success mt-2 mb-2"
-      >
-        Add to Cart
-      </button>
-      )
-    );
-  };
-
-  const showRemoveFromCart = () => {
-  // conditionally renders btn based on the presence of an iteam in the cart context state
-    if(cart.cartItems.some((item)=> item.id === product.id))
-    // Note on some function below
-    return (
-      removeFromCart  && (
         <button
-          onClick={handleRemoveFromCart}
-          className="btn btn-block btn-outline-danger mt-2 mb-2"
+          onClick={handleAddToCart}
+          className="btn btn-block btn-outline-success mt-2 mb-2"
         >
-          Remove from cart
+          Add to Cart
         </button>
       )
     );
   };
+
+/**
+ * Conditionally renders the "Remove from cart" button based on the presence of an item in the cart context state.
+ */
+const showRemoveFromCart = () => {
+  console.log("Product ID:", product.id);
+  console.log("Cart Items:", cart.cartItems);
+  console.log("showRemoveFromCart called");
+  // Check if cart is available and if the item is present in the cartItems
+  if (cart && cart.cartItems.some((item) => item.id === product.id)) {
+    return (
+      <button
+        onClick={handleRemoveFromCart}
+        className="btn btn-block btn-outline-danger mt-2 mb-2"
+      >
+        Remove from cart
+      </button>
+    );
+  }
+  // Return null if cart or item is not found in cartItems
+  return null;
+};
 
   return (
     <div className="card text-white bg-dark border border-info ">
@@ -84,10 +92,10 @@ const Card = ({ product }) => {
 
 export default Card;
 
+// The sum()
 
-                // The sum()
-
-{/* The some() function is an array method in JavaScript that 
+{
+  /* The some() function is an array method in JavaScript that 
 tests whether at least one element in the array passes a 
 provided condition. Here's an explanation of how it works:
 
@@ -99,4 +107,5 @@ The some() function iterates over each element in the array
 and invokes the callback function on each iteration.
 If the callback function returns true for any element, 
 the some() function immediately returns true without furthe
-iteration and stops checking the remaining elements. */}
+iteration and stops checking the remaining elements. */
+}
