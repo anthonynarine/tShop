@@ -63,6 +63,8 @@ function SignIn() {
       if (data.token) {
         dispatch({ type: "AUTHENTICATE", payload: data.token });
         //Toggles isAuthenticated from false to true in initial state
+        // Store the user ID in the context (assuming 'data.user.id' contains the user ID)
+        dispatch({ type: "SET_USER_ID", payload: data.user.id });
         dispatch({ type: "SET_AUTHENTICATED", payload: true });
       } else {
         console.log("session exist");
@@ -71,7 +73,7 @@ function SignIn() {
       // Clear form data upon successful login
       setValues({ email: "", password: "", error: "", loading: false, success: true });
       // console.log("CART_STATE_UPDATED:", cart)
-      navigate("/");
+      // navigate("/");
     } catch (error) {
       console.error(error);
       // Set loading to false and success to false in case of error
@@ -81,9 +83,9 @@ function SignIn() {
 
   // TEST
   useEffect(() => {
-    console.log("TEST_STATE_Signin:", cart);
-    console.log(isAuthenticated)
-  }, [cart]);
+    console.log("CART STATE:", cart);
+    console.log("Is Authenticated:", isAuthenticated);
+  }, [cart, isAuthenticated]);
 
   // Function to render the error message
   const errorMessage = () => {

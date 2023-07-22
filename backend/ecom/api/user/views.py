@@ -9,8 +9,10 @@ import re
 import secrets
 import random
 import string
-from rest_framework.decorators import authentication_classes, permission_classes
+import Respon
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import viewsets
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
 from .models import CustomUser
@@ -48,23 +50,25 @@ def generate_session_token(length=10):
     # return token
 
 
-@csrf_exempt
+@api_view(["POST"])
 @authentication_classes([TokenAuthentication])  # Add the desired authentication class
 @permission_classes([AllowAny])
 def login_user(request):
     """Sign in functionality"""
+    print("Received login request.")
+    
     if request.method != "POST":
-        return JsonResponse({"error": "Send a POST request with valid parameters only"})
+        return Response({"error": "Send a POST request with valid parameters only"})
 
     email = request.POST.get("email")
     password = request.POST.get("password")
 
     if not email or not password:
-        return JsonResponse({"error": "Email and password are required"})
+        return Response({"error": "Email and password are required"})
 
     # Validate email format using regular expression
     if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
-        return JsonResponse({"error": "Enter a valid email"})
+        return Response({"error": "Enter a valid email"})
 
     UserModel = get_user_model()
 
@@ -75,7 +79,7 @@ def login_user(request):
             if user.session_token != "0":
                 user.session_token = "0"
                 user.save()
-                return JsonResponse({"error": "A previous session exists!"})
+                return Response({"error": "A previous session exists!"})
 
             token = generate_session_token()  # Generate session token
             user.session_token = token
@@ -86,15 +90,17 @@ def login_user(request):
             login(request, authenticated_user)
 
             serializer = UserSerializer(user)
-            return JsonResponse({"token": token, "user": serializer.data})
+            return Response({"token": token, "user": serializer.data})
         else:
-            return JsonResponse({"error": "Invalid password"})
+            return Response({"error": "Invalid password"})
 
     except UserModel.DoesNotExist:
-        return JsonResponse({"error": "Invalid email"})
+        return Response({"error": "Invalid email"})
 
 
+@api_view(['POST'])
 def logout_user(request, id):
+    print("Found user ID is:", id)
     # Log out the user using Django's built-in logout function
     logout(request)
 
@@ -102,12 +108,15 @@ def logout_user(request, id):
 
     try:
         user = UserModel.objects.get(pk=id)
-        user.session_token = "0"
+        print("Found user:", user)
+        user.session_token = "0" # Reset the session token to "0" when logging out
         user.save()
     except UserModel.DoesNotExist:
-        return JsonResponse({"error": "Invalid user ID"})
+        return Response({"error": "Invalid user ID"})
 
-    return JsonResponse({"success": "Logged out"})
+    return Response({"success": f"Logged out user with ID {id}"}, status=200)
+
+
 
 
 class UserViewSet(viewsets.ModelViewSet):

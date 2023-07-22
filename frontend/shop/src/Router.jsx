@@ -4,8 +4,10 @@ import Home from "./core/Home";
 import { CartProvider } from "./core/helper/CartContext";
 import SignUp from "./user/SignUp";
 import SignIn from "./user/SignIn";
+import { PrivateRoutes } from "./core/helper/PrivateRoutes";
 
 import NavBar from "./core/NavBar";
+import UserDashboard from "./user/UserDashboard";
 
 export default function Router() {
   return (
@@ -15,6 +17,8 @@ export default function Router() {
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+        {/* If you want to protect a specific nested route */}
+        {/* <PrivateRoutes path="api/user/dashboard/*" element={<UserDashboard />} /> */}
       </Routes>
     </CartProvider>
   );

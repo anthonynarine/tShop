@@ -22,8 +22,6 @@ function NavBar() {
 
   let { signOut, isAuthenticated } = useCart();
 
-  let isloggedin = isAuthenticated;
-
   return (
     <div>
       <ul className="nav nav-tabs bg-dark">
@@ -51,7 +49,14 @@ function NavBar() {
               className="nav-link text-warning"
               to="/signin"
               onClick={() => {
-                signOut();
+                signOut(()=>{
+                  return (
+                    <div className="alert alert-success text-center w-50 col-md-6 offset-sm-3 text-left">
+                      Logout successful!
+
+                    </div>
+                  )
+                });
                 navigate("/signin");
               }}
             >
@@ -68,7 +73,6 @@ function NavBar() {
         )}
         {/* Signup link */}
 
-        <li >{console.log(isloggedin)}</li>
       </ul>
     </div>
   );
