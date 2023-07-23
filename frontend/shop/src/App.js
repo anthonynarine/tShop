@@ -12,17 +12,38 @@ import UserDashboard from "./user/UserDashboard";
 
 function App() {
   return (
-    <CartProvider>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signin" element={<SignIn />} />
-        {/* If you want to protect a specific nested route */}
-        {/* <PrivateRoutes path="api/user/dashboard/*" element={<UserDashboard />} /> */}
-      </Routes>
-    </CartProvider>
+    <>
+      <AuthProvider>
+        <CartProvider>
+          <NavBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signin" element={<SignIn />} />
+            {/* If you want to protect a specific nested route */}
+            {/* <PrivateRoutes path="api/user/dashboard/*" element={<UserDashboard />} /> */}
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+    </>
   );
 }
 
 export default App;
+
+
+/*                      structure:
+
+AuthProvider wraps the entire app and provides authentication-related data
+and actions to its children.
+
+CartProvider wraps the entire app and provides
+cart-related data and actions to its children.
+
+NavBar is placed outside the Routes component, 
+which ensures it is visible on all pages/routes.
+
+setup, should have access to the isAuthenticated 
+value in the NavBar component using the custom hook useAuth.
+It should no longer show isAuthenticated as undefined. */
+
