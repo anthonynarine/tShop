@@ -8,12 +8,24 @@ import ImageHelper from "./helper/imageHelper";
 import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
 
 
+
 const Card = ({ product }) => {
   console.log("Product:", product);
   // const { addToCart, removeFromCart, cart } = useContext(CartContext); WITHOUT CUSTOM HOOK
   const { addToCartAction, removeFromCartAction, cart } = useCart(); // W/ custom hook useCart (see CartContext)
-  const { isAuthenticated } = useAuth(); // Get the isAuthenticated value from the useAuth hook
+  // const { isAuthenticated } = useAuth(); // Get the isAuthenticated value from the useAuth hook
   const navigate = useNavigate();
+
+  let isAuthenticated = true  
+
+  // Check if cart and isAuthenticated are available
+  if (typeof cart === "undefined" || typeof isAuthenticated === "undefined") {
+    // Return loading or empty component while waiting for context data to be available
+    return <div>Loading...</div>;
+  }
+
+
+  console.log("isAuthenticated is:", isAuthenticated, "from Card");
 
   // check if data is available
   if (!product) {

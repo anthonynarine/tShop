@@ -1,8 +1,9 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState } from "react";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
 import { useAuth } from "../core/helper/AuthContext";
+
 
 function SignIn() {
   const [values, setValues] = useState({
@@ -22,16 +23,12 @@ function SignIn() {
     setValues({ ...values, error: false, [keyName]: event.target.value });
   };
 
-  // Access the CartContext value, which includes the dispatch function WITHOUT THE CUSTOM HOOK
-  // const cartContextValue = useContext(CartContext);
-  // const { dispatch, cart } = cartContextValue;
 
-  // Access the dispatch function using the custom hook useCart (see CartContext)
-  const { dispatch, cart, isAuthenticated } = useAuth(); // WITH CUSTOM HOOK
+  // Access the dispatch function using the custom hook useAuth (see AuthContext)
+  const { dispatch} = useAuth(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request
-
   async function login(event) {
     event.preventDefault();
     // Set loading to true before making the API request
@@ -47,7 +44,7 @@ function SignIn() {
 
       // TEST Log the keys present in formData
       for (const key of formData.keys()) {
-        console.log("TEST_KEY_NAME", key);
+        console.log("NAME OF KEY ADDED", key); //..TEST
       }
 
       const response = await fetch(`${baseUrl}/api/user/login/`, {
@@ -58,20 +55,23 @@ function SignIn() {
         throw new Error("something went wrong");
       }
       const data = await response.json();
-      console.log("TEST_Logged_in_user_data:", data);
+      console.log("Server Response Data:", data); //..TEST
+      console.log("Token:", data.token); //..TEST
+      console.log("UserID:", data.user.id); //..TEST
       //Stores the token that comes with the user object as the token value in initial state
-      if (data.token) {
-        dispatch({ type: "AUTHENTICATE", payload: data.token });
+      if (data.token && data.user.id) {
+        console.log("Inside if block: Condition met, data.token and data.user.id exist"); //TEST
+        dispatch({ type: "AUTHENTICATE", payload: data.token, userId: data.user.id });
         //Toggles isAuthenticated from false to true in initial state
         // Store the user ID in the context (assuming 'data.user.id' contains the user ID)
-        dispatch({ type: "SET_USER_ID", payload: data.user.id });
+        // dispatch({ type: "SET_USER_ID", payload: data.user.id });
         dispatch({ type: "SET_AUTHENTICATED", payload: true });
       } else {
-        console.log("session exist");
+        console.log("Missing token or userId in response data"); //..TEST
       }
 
       // Clear form data upon successful login
-      setValues({ email: "", password: "", error: "", loading: false, success: true });
+      // setValues({ email: "", password: "", error: "", loading: false, success: true });
       // console.log("CART_STATE_UPDATED:", cart)
       // navigate("/");
     } catch (error) {
@@ -81,11 +81,6 @@ function SignIn() {
     }
   }
 
-  // TEST
-  useEffect(() => {
-    console.log("CART STATE:", cart);
-    console.log("Is Authenticated:", isAuthenticated);
-  }, [cart, isAuthenticated]);
 
   // Function to render the error message
   const errorMessage = () => {

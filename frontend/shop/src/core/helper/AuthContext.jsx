@@ -22,11 +22,12 @@ export const useAuth = () => {
 const initialState = {
   isAuthenticated: false,
   token: null,
-  id: null,
+  userId: null,
 };
 
 // AuthReducer - updates authentication state based on dispatched actions
 let authReducer = (state, action) => {
+  console.log("Action:", action); // Log the dispatched action
   switch (action.type) {
     // Authenticates the user and stores the token in the authentication state.
     // @param {string} action.payload - The token obtained from the authentication process.
@@ -144,6 +145,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={authContextValue}>
+      {children}
+    </AuthContext.Provider>
   );
 };
