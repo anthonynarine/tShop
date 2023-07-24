@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
 
   // SHOW CURRENT VALUE(S) OF STATE IN auth
-  console.log("auth State Values:", authState);
+  // console.log("auth State Values:", authState);  //TEST
 
   // Action creator function to authenticate the user with a token.
   // @param {string} token - The token obtained from the user object.
@@ -132,6 +132,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // *************************SIGNOUT ACTION CREATOR FUNCTION END **********************************//
+
+  
+
+
+
 
   //.....
 

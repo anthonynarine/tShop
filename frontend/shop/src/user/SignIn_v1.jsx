@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
-import { authenticate } from "../auth/helper";
+import { useAuth } from "../core/helper/AuthContext";
 
 
 function SignIn() {
@@ -18,10 +18,14 @@ function SignIn() {
   const { email, password, error, success, loading } = values;
 
   // Function to handle changes in form input fields
+
   const handleChange = (keyName) => (event) => {
     setValues({ ...values, error: false, [keyName]: event.target.value });
   };
 
+
+  // Access the dispatch function using the custom hook useAuth (see AuthContext)
+  const { dispatch} = useAuth(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request
@@ -34,12 +38,12 @@ function SignIn() {
       const formData = new FormData();
       // Append the email and password to the FormData object
       // name is the name of the key || will only add the form input value keys
-      for (let name in values) {
+      for (const name in values) {
         formData.append(name, values[name]);
       }
 
       // TEST Log the keys present in formData
-      for (let key of formData.keys()) {
+      for (const key of formData.keys()) {
         console.log("NAME OF KEY ADDED", key); //..TEST
       }
 
@@ -56,9 +60,12 @@ function SignIn() {
       console.log("UserID:", data.user.id); //..TEST
       //Stores the token that comes with the user object as the token value in initial state
       if (data.token && data.user.id) {
-        authenticate(data.token, ()=>{navigate("/")})
-        setValues({...values, loading: false, success: true,});
         console.log("Inside if block: Condition met, data.token and data.user.id exist"); //TEST
+        dispatch({ type: "AUTHENTICATE", payload: data.token, userId: data.user.id });
+        //Toggles isAuthenticated from false to true in initial state
+        // Store the user ID in the context (assuming 'data.user.id' contains the user ID)
+        // dispatch({ type: "SET_USER_ID", payload: data.user.id });
+        dispatch({ type: "SET_AUTHENTICATED", payload: true });
       } else {
         console.log("Missing token or userId in response data"); //..TEST
       }
@@ -72,7 +79,8 @@ function SignIn() {
       // Set loading to false and success to false in case of error
       setValues({ ...values, loading: false, success: false });
     }
-  };
+  }
+
 
   // Function to render the error message
   const errorMessage = () => {
@@ -101,8 +109,7 @@ function SignIn() {
     return null;
   };
 
- //....TODO SEPERATE THIS INTO IT'S OWN COMPONENT AND IMPORT 
-  const signInForm = () => {
+  let signInForm = () => {
     return (
       <div className="row">
         <div className="col-md-6 offset-sm-3 text-left">

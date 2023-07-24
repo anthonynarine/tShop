@@ -1,7 +1,6 @@
 import { API } from "../../backend";
-import { useContext } from "react";
-import { CartContext } from "./helper/CartContext";
 import { cartEmpty } from "../../core/helper/cartHelper";
+import { baseUrl } from "../../core/shared";
 
 /**
  * Performs a signup API request.
@@ -51,7 +50,7 @@ export const login = async (userData) => {
 
   try {
     // Send a POST request to the login API endpoint
-    const response = await fetch(`${API}user/login/`, {
+    const response = await fetch(`${baseUrl}user/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,22 +74,26 @@ export const login = async (userData) => {
 
 
 /**
- * Authenticates the user by storing the provided token in the local storage.
- * @param {Object} user - The user object containing the token.
+ * Stores the user token in the localStorage
+ * 
+ * @param {Object} data - The data object should contain the user token
+ * @param {function} next - A callback function
  */
-export const authenticate = (userData, next) => {
-    // Check if the window object is defined (for client-side rendering)
-    if (typeof window !== "undefined") {
-      // Extract the token from the user object
-      const { token } = userData;
-  
+export const authenticate = (token, next) => {
+  // Check if the window object is defined (for client-side rendering)
+  if (typeof window !== "undefined") {
+    if (token) {
       // Store the token in the local storage
       localStorage.setItem("token", token);
-  
+
       // Execute the callback function
       next();
+    } else {
+      // Log an error when the data object is not valid
+      console.error("Invalid data object. Expected an object with a token property.")
     }
-  };
+  }
+};
   
   /**
    * Checks if the user is authenticated by verifying the presence of a token in the local storage.
