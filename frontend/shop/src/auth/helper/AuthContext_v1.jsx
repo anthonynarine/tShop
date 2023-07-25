@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from "react";
-import { baseUrl } from "../shared";
+import { baseUrl } from "../../core/shared";
 
 // Create a custom hook 'useAuth'
 // Custom hook to access the AuthContext and retrieve authentication state and actions.

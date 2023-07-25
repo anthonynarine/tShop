@@ -79,9 +79,9 @@ export const AuthProvider = ({ children }) => {
     dispatch,
     authenticate,
     setAuthenticated,
-    isAuthenticated: authState.isAuthenticated,
     setUserId,
     signOut,
+    isAuthenticated: authState.isAuthenticated,
   };
 
   return (
