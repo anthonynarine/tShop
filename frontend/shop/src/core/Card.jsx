@@ -1,69 +1,99 @@
 /* eslint-disable no-lone-blocks */
-import React, { useContext } from "react";
-import { CartContext, useCart } from "./helper/CartContext";
-import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
-import ImageHelper from "./helper/imageHelper";
+import React from "react";
+import { useCart } from "./helper/CartContext";
+import { useAuth } from "../auth/helper/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ImageHelper from "./helper/imageHelper";
 
-const isAuthenticated = true;
-
+/**
+ * Component to display a card for a product with options to add to or remove from the cart.
+ *
+ * @param {Object} product - The product object to be displayed on the card.
+ * @returns {JSX.Element} - The JSX element for the card component.
+ */
 const Card = ({ product }) => {
+  // Get the cart state and actions using the custom hook useCart
+  const { addToCartAction, removeFromCartAction, cart } = useCart();
+
+  // Get the isAuthenticated value using the custom hook useAuth
+  const { isAuthenticated } = useAuth();
+
+  // Get the navigate function from React Router to handle navigation
   const navigate = useNavigate();
 
-  // const { addToCart, removeFromCart, cart } = useContext(CartContext); WITHOUT CUSTOM HOOK
-  const { addToCart, removeFromCart, cart } = useCart();  // W/ custom hook useCart (see CartContext)
+  // Log the product object for debugging purposes
+  console.log("Product:", product);
 
-  // check if data is available
+  // Check if data is available
   if (!product) {
     return <div>Loading...</div>;
   }
 
+  /**
+   * Function to handle adding the product to the cart.
+   * If the user is authenticated, it calls the addToCartAction from the cart context.
+   * If not authenticated, it redirects the user to the signin page.
+   */
   const handleAddToCart = () => {
     if (isAuthenticated) {
-      addToCart(product); // context
-      console.log("added to cart");
+      addToCartAction(product);
+      console.log("Added to cart");
     } else {
-      console.log("login please");
-      navigate("/login"); // Redirect to the login page
+      console.log("Please log in");
+      navigate("/signin");
     }
   };
 
+  /**
+   * Function to handle removing the product from the cart.
+   * It calls the removeFromCartAction from the cart context.
+   */
   const handleRemoveFromCart = () => {
-    removeFromCart(product);
-    console.log("removed from cart");
+    removeFromCartAction(product);
+    console.log("Removed from cart");
   };
 
+  /**
+   * Function to render the "Add to Cart" button.
+   *
+   * @returns {JSX.Element|null} - The JSX element for the button or null if not rendered.
+   */
   const showAddToCartBtn = () => {
     return (
-      handleAddToCart && (
       <button
         onClick={handleAddToCart}
         className="btn btn-block btn-outline-success mt-2 mb-2"
       >
         Add to Cart
       </button>
-      )
     );
   };
 
+  /**
+   * Function to render the "Remove from Cart" button.
+   * It checks if the product is present in the cart and renders the button accordingly.
+   *
+   * @returns {JSX.Element|null} - The JSX element for the button or null if not rendered.
+   */
   const showRemoveFromCart = () => {
-  // conditionally renders btn based on the presence of an iteam in the cart context state
-    if(cart.cartItems.some((item)=> item.id === product.id))
-    // Note on some function below
-    return (
-      removeFromCart  && (
+    console.log("Product ID:", product.id);
+    console.log("Cart Items:", cart.cartItems);
+    console.log("showRemoveFromCart called");
+    if (cart && cart.cartItems.some((item) => item.id === product.id)) {
+      return (
         <button
           onClick={handleRemoveFromCart}
           className="btn btn-block btn-outline-danger mt-2 mb-2"
         >
-          Remove from cart
+          Remove from Cart
         </button>
-      )
-    );
+      );
+    }
+    return null;
   };
 
   return (
-    <div className="card text-white bg-dark border border-info ">
+    <div className="card text-white bg-dark border border-info">
       <div className="card-header lead">
         <h4>{product.name}</h4>
       </div>
@@ -84,10 +114,10 @@ const Card = ({ product }) => {
 
 export default Card;
 
+// The sum()
 
-                // The sum()
-
-{/* The some() function is an array method in JavaScript that 
+{
+  /* The some() function is an array method in JavaScript that 
 tests whether at least one element in the array passes a 
 provided condition. Here's an explanation of how it works:
 
@@ -99,4 +129,5 @@ The some() function iterates over each element in the array
 and invokes the callback function on each iteration.
 If the callback function returns true for any element, 
 the some() function immediately returns true without furthe
-iteration and stops checking the remaining elements. */}
+iteration and stops checking the remaining elements. */
+}

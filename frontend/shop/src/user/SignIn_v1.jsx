@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
-import { useAuth } from "../auth/helper/AuthContext";
+import { useAuth } from "../auth/helper/AuthContext_v1";
+
 
 function SignIn() {
-  // Access the dispatch function using the custom hook useAuth
-  const { dispatch } = useAuth();
-
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -20,10 +18,14 @@ function SignIn() {
   const { email, password, error, success, loading } = values;
 
   // Function to handle changes in form input fields
+
   const handleChange = (keyName) => (event) => {
     setValues({ ...values, error: false, [keyName]: event.target.value });
   };
 
+
+  // Access the dispatch function using the custom hook useAuth (see AuthContext)
+  const { dispatch} = useAuth(); // WITH CUSTOM HOOK
   const navigate = useNavigate();
 
   // Function to handle the login request
@@ -33,12 +35,21 @@ function SignIn() {
     setValues({ ...values, error: false, loading: true });
 
     try {
+      const formData = new FormData();
+      // Append the email and password to the FormData object
+      // name is the name of the key || will only add the form input value keys
+      for (const name in values) {
+        formData.append(name, values[name]);
+      }
+
+      // TEST Log the keys present in formData
+      for (const key of formData.keys()) {
+        console.log("NAME OF KEY ADDED", key); //..TEST
+      }
+
       const response = await fetch(`${baseUrl}/api/user/login/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+        body: formData,
       });
       if (!response.ok) {
         throw new Error("something went wrong");
@@ -49,23 +60,19 @@ function SignIn() {
       console.log("UserID:", data.user.id); //..TEST
       //Stores the token that comes with the user object as the token value in initial state
       if (data.token && data.user.id) {
-        // Dispatch actions to update the authentication state
+        console.log("Inside if block: Condition met, data.token and data.user.id exist"); //TEST
         dispatch({ type: "AUTHENTICATE", payload: data.token, userId: data.user.id });
+        //Toggles isAuthenticated from false to true in initial state
+        // Store the user ID in the context (assuming 'data.user.id' contains the user ID)
+        // dispatch({ type: "SET_USER_ID", payload: data.user.id });
         dispatch({ type: "SET_AUTHENTICATED", payload: true });
-        setValues({ ...values, loading: false, success: true });
-        navigate("/");
-        setValues({ ...values, loading: false, success: true });
-        console.log(
-          "Inside if block: Condition met, data.token and data.user.id exist"
-        ); //TEST
       } else {
         console.log("Missing token or userId in response data"); //..TEST
-        setValues({ ...values, loading: false });
       }
 
       // Clear form data upon successful login
       // setValues({ email: "", password: "", error: "", loading: false, success: true });
-      // console.log("CART_STATE_UPDATED:", cart);
+      // console.log("CART_STATE_UPDATED:", cart)
       // navigate("/");
     } catch (error) {
       console.error(error);
@@ -73,6 +80,7 @@ function SignIn() {
       setValues({ ...values, loading: false, success: false });
     }
   }
+
 
   // Function to render the error message
   const errorMessage = () => {
@@ -101,8 +109,7 @@ function SignIn() {
     return null;
   };
 
-  //....TODO SEPERATE THIS INTO IT'S OWN COMPONENT AND IMPORT
-  const signInForm = () => {
+  let signInForm = () => {
     return (
       <div className="row">
         <div className="col-md-6 offset-sm-3 text-left">

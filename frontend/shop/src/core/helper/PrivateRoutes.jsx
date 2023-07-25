@@ -1,7 +1,6 @@
 /* eslint-disable no-lone-blocks */
-import React, { useContext } from "react";
-import { CartContext } from "./helper/CartContext";
-import { Route, Navigate } from "react-router-dom";
+import { useCart } from "./CartContext";
+import { Outlet, Navigate } from "react-router-dom";
 
 
 
@@ -13,23 +12,15 @@ import { Route, Navigate } from "react-router-dom";
  * @param {string} props.path - The path of the route.
  * @returns {JSX.Element} The PrivateRoute component.
  */
-export const PrivateRoute = ({ element: Component, ...rest }) => {
-    const { cart } = useContext(CartContext);
-    const isAuthenticated = cart.isAuthenticated;
-  
-    return (
-      <Route
-        {...rest}
-        element={
-          isAuthenticated ? (
-            <Component />
-          ) : (
-            <Navigate to="/login" replace /> //look up replace 
-          )
-        }
-      />
-    );
-  };
+export const PrivateRoutes = ({ element: Component, ...rest }) => {
+  const { isAuthenticated } = useCart();
+
+  return (
+
+        isAuthenticated ? <Outlet /> : <Navigate to="/signin" />
+
+  );
+};
 
 
 {/*

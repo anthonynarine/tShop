@@ -9,8 +9,13 @@ import re
 import secrets
 import random
 import string
-from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework import viewsets
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
 from .models import CustomUser
@@ -48,23 +53,39 @@ def generate_session_token(length=10):
     # return token
 
 
-@csrf_exempt
+@api_view(["POST"])
 @authentication_classes([TokenAuthentication])  # Add the desired authentication class
 @permission_classes([AllowAny])
 def login_user(request):
-    """Sign in functionality"""
-    if request.method != "POST":
-        return JsonResponse({"error": "Send a POST request with valid parameters only"})
+    """
+     Sign in functionality for users.
 
-    email = request.POST.get("email")
-    password = request.POST.get("password")
+    This function allows users to sign in by providing their email and password.
+    It validates the provided email format and checks the password for authentication.
+    If the login is successful, a session token is generated for the user, and they are logged in.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: JSON response containing the session token and user information on successful login.
+                 Error response if the request method is not POST or if the login fails.
+
+    """
+    print("Received login request.")
+
+    if request.method != "POST":
+        return Response({"error": "Send a POST request with valid parameters only"})
+
+    email = request.data.get("email")
+    password = request.data.get("password")
 
     if not email or not password:
-        return JsonResponse({"error": "Email and password are required"})
+        return Response({"error": "Email and password are required"})
 
     # Validate email format using regular expression
     if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
-        return JsonResponse({"error": "Enter a valid email"})
+        return Response({"error": "Enter a valid email"})
 
     UserModel = get_user_model()
 
@@ -75,7 +96,7 @@ def login_user(request):
             if user.session_token != "0":
                 user.session_token = "0"
                 user.save()
-                return JsonResponse({"error": "A previous session exists!"})
+                return Response({"error": "A previous session exists!"})
 
             token = generate_session_token()  # Generate session token
             user.session_token = token
@@ -86,28 +107,46 @@ def login_user(request):
             login(request, authenticated_user)
 
             serializer = UserSerializer(user)
-            return JsonResponse({"token": token, "user": serializer.data})
+            return Response({"token": token, "user": serializer.data})
         else:
-            return JsonResponse({"error": "Invalid password"})
+            return Response({"error": "Invalid password"})
 
     except UserModel.DoesNotExist:
-        return JsonResponse({"error": "Invalid email"})
+        return Response({"error": "Invalid email"})
 
 
+@api_view(["POST"])
 def logout_user(request, id):
-    # Log out the user using Django's built-in logout function
+    """
+    Log out functionality for users.
+
+    This function allows users to log out by providing their user ID (UUID).
+    It ends the user's session by using Django's built-in logout function.
+    The user's session token is reset to "0" after logging out.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+        id (str): The user's ID (UUID) to identify the user to log out.
+
+    Returns:
+        Response: JSON response with a success message if the user is successfully logged out.
+                 Error response if the user with the provided ID is not found.
+
+    """
+    print("Found user ID is:", id)
     logout(request)
 
     UserModel = get_user_model()
 
     try:
         user = UserModel.objects.get(pk=id)
-        user.session_token = "0"
+        print("Found user:", user)
+        user.session_token = "0"  # Reset the session token to "0" when logging out
         user.save()
     except UserModel.DoesNotExist:
-        return JsonResponse({"error": "Invalid user ID"})
+        return Response({"error": "Invalid user ID"})
 
-    return JsonResponse({"success": "Logged out"})
+    return Response({"success": f"Logged out user with ID {id}"}, status=200)
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -1,80 +1,91 @@
 import React from "react";
-import { useCart } from "./helper/CartContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../auth/helper";
+import { useAuth } from "../auth/helper/AuthContext";
 
 function NavBar() {
-  let location = useLocation();
-  let navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { authState, dispatch } = useAuth();
+  const { isAuthenticated } = authState;
 
-  /**
-   * Function to determine the current tab style based on the route path.
-   * @param {object} location - The current location object from the `useLocation` hook.
-   * @param {string} path - The path to compare with the current location pathname.
-   * @returns {object} The style object with the color property for the current tab.
-   */
-  let currentTab = (path) => {
-    if (location.pathname === path) {
-      return { color: "#2ecc72" };
-    } else {
-      return { color: "#ffffff" };
-    }
+  const handleLogout = async () => {
+    await logout();
+    dispatch({ type: "SET_AUTHENTICATED", payload: false });
+    navigate("/signin");
   };
 
-  let { signOut, isAuthenticated } = useCart();
-
-  let isloggedin = isAuthenticated;
+  const isActiveTab = (path) => location.pathname === path;
 
   return (
     <div>
       <ul className="nav nav-tabs bg-dark">
+        {/* Home Link */}
         <li className="nav-item">
-          <Link style={currentTab("/")} className="nav-link" to="/">
+          <Link
+            to="/"
+            className="nav-link"
+            style={isActiveTab("/") ? { color: "#2ecc72" } : { color: "#ffffff" }}
+          >
             Home
           </Link>
         </li>
+
+        {/* Cart Link */}
         <li className="nav-item">
-          <Link style={currentTab("/cart")} className="nav-link" to="/cart">
+          <Link
+            to="/cart"
+            className="nav-link"
+            style={isActiveTab("/cart") ? { color: "#2ecc72" } : { color: "#ffffff" }}
+          >
             Cart
           </Link>
         </li>
+
+        {/* Signup Link */}
         <li className="nav-item">
-          <Link style={currentTab("/signup")} className="nav-link" to="/signup">
+          <Link
+            to="/signup"
+            className="nav-link"
+            style={isActiveTab("/signup") ? { color: "#2ecc72" } : { color: "#ffffff" }}
+          >
             Signup
           </Link>
         </li>
-        {/* Conditional rendering of Signin link */}
-        {isAuthenticated ? (
-          // If the user is signed in, render the Signout link
+
+        {/* Signin Link */}
+        {!isAuthenticated && (
           <li className="nav-item">
             <Link
-              style={{ cursor: "pointer", ...currentTab("/signin") }}
-              className="nav-link text-warning"
               to="/signin"
-              onClick={() => {
-                signOut();
-                navigate("/signin");
-              }}
+              className="nav-link"
+              style={isActiveTab("/signin") ? { color: "#2ecc72" } : { color: "#ffffff" }}
             >
-              LogOut
-            </Link>
-          </li>
-        ) : (
-          // If the user is not signed in, render the Signin link
-          <li className="nav-item">
-            <Link style={currentTab("/signin")} className="nav-link" to="/signin">
-              LogIn
+              Signin
             </Link>
           </li>
         )}
-        {/* Signup link */}
 
-        <li >{console.log(isloggedin)}</li>
+        {/* Logout Button */}
+        {isAuthenticated && (
+          <li className="nav-item">
+            <button
+              className="nav-link btn btn-link text-white"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </li>
+        )}
       </ul>
     </div>
   );
 }
 
 export default NavBar;
+
+
+
 
 // useLocation hook
 /* In React Router, the useLocation hook is a custom hook that allows
