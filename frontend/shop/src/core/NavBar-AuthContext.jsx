@@ -1,9 +1,39 @@
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./helper/AuthContext";
 
 
 function NavBar() {
   let location = useLocation();
   let navigate = useNavigate();
+
+  // Get the isAuthenticated value and the signOut function from the useAuth hook
+  const { isAuthenticated, signOut, authState } = useAuth(); 
+
+  // when NavBar is first rendered assume that authentication data is still loading
+  // added this functionality b/c isAuthenticated was coming up as undefied 
+  // If the authentication state is still loading, you can choose to render a loading message or nothing
+  // This can be helpful if there are certain components or elements that depend on the authentication state
+  const [loading, setLoading] = useState(true); 
+
+  useEffect(() => {
+    // When the isAuthenticated value is defined in the authState, setLoading to false
+    if (typeof authState.isAuthenticated !== "undefined") {
+      setLoading(false);
+    }
+  }, [authState.isAuthenticated]);
+
+  // Render a message (TODO TRY A SPINNER) while auth state is being fetched
+  if(loading) {
+    return <div>loading...</div>
+  };
+
+  
+    
+  // console.log("isAuthenticated is", isAuthenticated, "from navbar") //..TEST
+  // console.log("loading:", loading); // Log the loading state
+  // console.log("isAuthenticated is", isAuthenticated, "from navbar"); // Log the isAuthenticated state
+  // console.log("authState:", authState); // Log the entire authState object
   
   /**
    * Function to determine the current tab style based on the route path.
@@ -19,6 +49,10 @@ function NavBar() {
     }
   };
 
+  let handleLogout = () => {
+    signOut();
+    navigate("/signin");
+  };
 
   return (
     <div>

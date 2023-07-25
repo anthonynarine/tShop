@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import Base from "../core/Base";
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../core/shared";
-import { authenticate } from "../auth/helper";
-
+import { useAuth } from "../auth/helper/AuthContext";
 
 function SignIn() {
+  // Access the dispatch function using the custom hook useAuth
+  const { dispatch } = useAuth();
+
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -31,21 +33,12 @@ function SignIn() {
     setValues({ ...values, error: false, loading: true });
 
     try {
-      const formData = new FormData();
-      // Append the email and password to the FormData object
-      // name is the name of the key || will only add the form input value keys
-      for (let name in values) {
-        formData.append(name, values[name]);
-      }
-
-      // TEST Log the keys present in formData
-      for (let key of formData.keys()) {
-        console.log("NAME OF KEY ADDED", key); //..TEST
-      }
-
       const response = await fetch(`${baseUrl}/api/user/login/`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
       if (!response.ok) {
         throw new Error("something went wrong");
@@ -56,23 +49,30 @@ function SignIn() {
       console.log("UserID:", data.user.id); //..TEST
       //Stores the token that comes with the user object as the token value in initial state
       if (data.token && data.user.id) {
-        authenticate(data.token, ()=>{navigate("/")})
-        setValues({...values, loading: false, success: true,});
-        console.log("Inside if block: Condition met, data.token and data.user.id exist"); //TEST
+        // Dispatch actions to update the authentication state
+        dispatch({ type: "AUTHENTICATE", payload: data.token, userId: data.user.id });
+        dispatch({ type: "SET_AUTHENTICATED", payload: true });
+        setValues({ ...values, loading: false, success: true });
+        navigate("/");
+        setValues({ ...values, loading: false, success: true });
+        console.log(
+          "Inside if block: Condition met, data.token and data.user.id exist"
+        ); //TEST
       } else {
         console.log("Missing token or userId in response data"); //..TEST
+        setValues({ ...values, loading: false });
       }
 
       // Clear form data upon successful login
       // setValues({ email: "", password: "", error: "", loading: false, success: true });
-      // console.log("CART_STATE_UPDATED:", cart)
+      // console.log("CART_STATE_UPDATED:", cart);
       // navigate("/");
     } catch (error) {
       console.error(error);
       // Set loading to false and success to false in case of error
       setValues({ ...values, loading: false, success: false });
     }
-  };
+  }
 
   // Function to render the error message
   const errorMessage = () => {
@@ -101,7 +101,7 @@ function SignIn() {
     return null;
   };
 
- //....TODO SEPERATE THIS INTO IT'S OWN COMPONENT AND IMPORT 
+  //....TODO SEPERATE THIS INTO IT'S OWN COMPONENT AND IMPORT
   const signInForm = () => {
     return (
       <div className="row">

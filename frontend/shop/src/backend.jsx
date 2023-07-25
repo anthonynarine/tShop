@@ -1,1 +1,1 @@
-export const API = process.env.DGANGO_BACKEND;
+export const API = process.env.REACT_APP_DJANGO_BACKEND;

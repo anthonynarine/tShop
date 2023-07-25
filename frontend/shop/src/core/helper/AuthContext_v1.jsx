@@ -133,11 +133,6 @@ export const AuthProvider = ({ children }) => {
 
   // *************************SIGNOUT ACTION CREATOR FUNCTION END **********************************//
 
-  
-
-
-
-
   //.....
 
   // Create the authentication context value
@@ -150,8 +145,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={authContextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>
   );
 };

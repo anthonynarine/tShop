@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./core/Home";
 import { CartProvider } from "./core/helper/CartContext";
-import { AuthProvider } from "./core/helper/AuthContext";
+import { AuthProvider } from "./auth/helper/AuthContext";
 import SignUp from "./user/SignUp";
 import SignIn from "./user/SignIn";
 import { PrivateRoutes } from "./core/helper/PrivateRoutes";

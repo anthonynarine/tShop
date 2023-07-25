@@ -2,12 +2,10 @@
 
 import React from "react";
 import { useCart } from "./helper/CartContext";
-import { useAuth } from "./helper/AuthContext";
+import { useAuth } from "../auth/helper/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ImageHelper from "./helper/imageHelper";
 import { addItemToCart, deleteItemFromCart } from "./helper/cartHelper"; //needed for browser cart state management
-
-
 
 const Card = ({ product }) => {
   console.log("Product:", product);
@@ -16,14 +14,13 @@ const Card = ({ product }) => {
   // const { isAuthenticated } = useAuth(); // Get the isAuthenticated value from the useAuth hook
   const navigate = useNavigate();
 
-  let isAuthenticated = true  
+  const { isAuthenticated } = useAuth();
 
   // Check if cart and isAuthenticated are available
   if (typeof cart === "undefined" || typeof isAuthenticated === "undefined") {
     // Return loading or empty component while waiting for context data to be available
     return <div>Loading...</div>;
   }
-
 
   console.log("isAuthenticated is:", isAuthenticated, "from Card");
 
@@ -60,27 +57,27 @@ const Card = ({ product }) => {
     );
   };
 
-/**
- * Conditionally renders the "Remove from cart" button based on the presence of an item in the cart context state.
- */
-const showRemoveFromCart = () => {
-  console.log("Product ID:", product.id);
-  console.log("Cart Items:", cart.cartItems);
-  console.log("showRemoveFromCart called");
-  // Check if cart is available and if the item is present in the cartItems
-  if (cart && cart.cartItems.some((item) => item.id === product.id)) {
-    return (
-      <button
-        onClick={handleRemoveFromCart}
-        className="btn btn-block btn-outline-danger mt-2 mb-2"
-      >
-        Remove from cart
-      </button>
-    );
-  }
-  // Return null if cart or item is not found in cartItems
-  return null;
-};
+  /**
+   * Conditionally renders the "Remove from cart" button based on the presence of an item in the cart context state.
+   */
+  const showRemoveFromCart = () => {
+    console.log("Product ID:", product.id);
+    console.log("Cart Items:", cart.cartItems);
+    console.log("showRemoveFromCart called");
+    // Check if cart is available and if the item is present in the cartItems
+    if (cart && cart.cartItems.some((item) => item.id === product.id)) {
+      return (
+        <button
+          onClick={handleRemoveFromCart}
+          className="btn btn-block btn-outline-danger mt-2 mb-2"
+        >
+          Remove from cart
+        </button>
+      );
+    }
+    // Return null if cart or item is not found in cartItems
+    return null;
+  };
 
   return (
     <div className="card text-white bg-dark border border-info ">
