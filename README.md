@@ -1,2 +1,2 @@
-# tShop
-React front  and Django backend tee shirt shop
+# tee-shirt-shop
+Django REST Framework, which serves as the backend API, and React as the frontend framework. 
